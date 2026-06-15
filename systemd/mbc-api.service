@@ -1,0 +1,16 @@
+[Unit]
+Description=MBC API Server
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/mbc-api
+ExecStart=/usr/bin/node /home/ubuntu/mbc-api/server.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=append:/home/ubuntu/api.log
+StandardError=append:/home/ubuntu/api.log
+
+[Install]
+WantedBy=multi-user.target

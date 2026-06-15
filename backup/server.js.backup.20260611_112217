@@ -1,0 +1,124 @@
+const express = require('express');
+const fs = require('fs');
+const fetch = require('node-fetch');
+
+const app = express();
+const addressCache = {};
+
+app.get('/api/holders', function(req, res) {
+    try {
+        const data = fs.readFileSync('/home/ubuntu/mbc_holders_final.json', 'utf8');
+        const parsed = JSON.parse(data);
+        res.json({
+            holders: parsed.holders || [],
+            count: parsed.count || 0,
+            blockHeight: parsed.blockHeight || 0
+        });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.get('/api/address/:addr', function(req, res) {
+    const addr = req.params.addr;
+
+    if (addressCache[addr] && Date.now() - addressCache[addr].time < 300000) {
+        return res.json({ transactions: addressCache[addr].data });
+    }
+
+    fetch('https://api.mbc.wiki/history/' + addr)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            const txids = (data.result && data.result.tx) ? data.result.tx : [];
+
+            if (txids.length === 0) {
+                return res.json({ transactions: [] });
+            }
+
+            // Promise.race로 **가장 빠른 30개만** 반환 (5초 타임아웃)
+            const timeout = new Promise(function(resolve) {
+                setTimeout(function() { resolve([]); }, 5000);
+            });
+
+            const promises = txids.slice(0, 30).map(function(txid) {
+                return fetch('https://api.mbc.wiki/transaction/' + txid, { timeout: 3000 })
+                    .then(function(r) { return r.json(); })
+                    .catch(function(e) { return null; });
+            });
+
+            Promise.race([Promise.all(promises), timeout]).then(function(results) {
+                const transactions = [];
+
+                (results || []).forEach(function(tx, idx) {
+                    if (tx && tx.result) {
+                        let received = 0, sent = 0, from = 'Unknown', to = 'Unknown';
+
+                        (tx.result.vin || []).forEach(function(vin) {
+                            if (vin.prevout && vin.prevout.scriptPubKey) {
+                                const vinAddr = vin.prevout.scriptPubKey.address || (vin.prevout.scriptPubKey.addresses ? vin.prevout.scriptPubKey.addresses[0] : null);
+                                if (vinAddr && vinAddr !== addr) {
+                                    from = vinAddr;
+                                    sent = sent + (vin.prevout.value || 0) / 10000;
+                                }
+                            }
+                        });
+
+                        const otherVouts = (tx.result.vout || []).filter(function(v) {
+                            const voutAddr = v.scriptPubKey.address || (v.scriptPubKey.addresses ? v.scriptPubKey.addresses[0] : null);
+                            return voutAddr && voutAddr !== addr;
+                        });
+
+                        (tx.result.vout || []).forEach(function(vout) {
+                            const voutAddr = vout.scriptPubKey.address || (vout.scriptPubKey.addresses ? vout.scriptPubKey.addresses[0] : null);
+                            if (voutAddr === addr) {
+                                received = received + (vout.value || 0) / 10000;
+                            }
+                        });
+
+                        to = otherVouts.length > 0 ? (otherVouts[0].scriptPubKey.address || otherVouts[0].scriptPubKey.addresses[0]) : addr;
+
+                        transactions.push({
+                            txid: txids[idx],
+                            from: from,
+                            to: to,
+                            received: Math.round(received * 10000),
+                            sent: Math.round(sent * 10000),
+                            confirmations: tx.result.confirmations || 0,
+                            time: tx.result.time || 0
+                        });
+                    }
+                });
+
+                addressCache[addr] = {
+                    data: transactions,
+                    time: Date.now()
+                };
+
+                res.json({ transactions: transactions });
+            });
+        })
+        .catch(function(e) {
+            res.status(500).json({ error: e.message });
+        });
+});
+
+app.get('/api/tokens/address/:addr', function(req, res) {
+    const addr = req.params.addr;
+    fetch('https://tokens.mbc.wiki/layer/address/' + addr)
+        .then(function(r) { return r.json(); })
+        .then(function(data) { res.json(data); })
+        .catch(function(e) { res.status(500).json({ error: e.message }); });
+});
+
+app.get('/api/tokens/transfers/:addr/:ticker', function(req, res) {
+    const addr = req.params.addr;
+    const ticker = req.params.ticker;
+    fetch('https://tokens.mbc.wiki/layer/address/' + addr + '/transfers/' + ticker)
+        .then(function(r) { return r.json(); })
+        .then(function(data) { res.json(data); })
+        .catch(function(e) { res.status(500).json({ error: e.message }); });
+});
+
+app.listen(3000, function() {
+    console.log('[' + new Date().toISOString() + '] API Server Started');
+});

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBC 블록체인 탐색기</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0a0e27; color: #fff; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #00d4ff, #0099cc); padding: 30px; border-radius: 10px; margin-bottom: 20px; }
+        h1 { font-size: 32px; margin-bottom: 10px; }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px; }
+        .stat-box { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 5px; text-align: center; }
+        .stat-value { font-size: 24px; font-weight: bold; }
+        .stat-label { font-size: 12px; opacity: 0.9; margin-bottom: 8px; }
+        .search-box { background: #1a1f3a; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 10px; }
+        .search-box input { flex: 1; padding: 12px; background: #0a0e27; border: 2px solid #00d4ff; border-radius: 5px; color: #fff; font-size: 14px; font-family: monospace; }
+        .search-box button { padding: 12px 30px; background: #00d4ff; color: #000; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .controls { display: flex; gap: 10px; margin-bottom: 20px; }
+        button { padding: 10px 20px; background: #00d4ff; color: #000; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #00a8cc; }
+        table { width: 100%; border-collapse: collapse; background: #1a1f3a; border-radius: 5px; overflow: hidden; font-size: 13px; }
+        th { background: #0099cc; padding: 12px 10px; text-align: left; font-weight: bold; }
+        td { padding: 10px; border-bottom: 1px solid #2a2f4a; word-break: break-all; }
+        tr:hover { background: #2a2f4a; }
+        .address { color: #00d4ff; cursor: pointer; text-decoration: underline; font-family: monospace; font-size: 12px; }
+        .token-badge { background: #4ade80; color: #000; padding: 4px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .pagination { display: flex; gap: 5px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
+        .pagination button { padding: 8px 12px; min-width: 40px; font-size: 12px; }
+        .pagination button.active { background: #00a8cc; }
+        .detail-page { display: none; }
+        .detail-page.show { display: block; }
+        .list-page.hide { display: none; }
+        .back-btn { background: #666; margin-bottom: 20px; }
+        .detail-header { background: #1a1f3a; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #00d4ff; }
+        .detail-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-top: 15px; }
+        .detail-stat { background: rgba(0,212,255,0.1); padding: 15px; border-radius: 5px; }
+        .tabs { display: flex; gap: 0; margin-top: 20px; border-bottom: 2px solid #2a2f4a; }
+        .tab { padding: 12px 30px; background: #1a1f3a; color: #999; cursor: pointer; border: none; font-weight: bold; }
+        .tab.active { background: #0099cc; color: #fff; border-bottom: 3px solid #00d4ff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .tx-in { color: #4ade80; font-weight: bold; }
+        .tx-out { color: #f87171; font-weight: bold; }
+        
+        /* 로딩 */
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,14,39,0.98); z-index: 999999; display: none; justify-content: center; align-items: center; }
+        .loading-overlay.show { display: flex; }
+        .loading-content { text-align: center; }
+        .spinner { width: 60px; height: 60px; border: 5px solid #1a1f3a; border-top: 5px solid #00d4ff; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-text { font-size: 18px; color: #00d4ff; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <!-- 로딩 오버레이 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div class="loading-text" id="loadingText">로딩 중...</div>
+        </div>
+    </div>
+
+    <div class="list-page" id="listPage">
+        <div class="container">
+            <header>
+                <h1>⚡ MicroBitcoin 탐색기</h1>
+                <div class="stats">
+                    <div class="stat-box"><div class="stat-label">블록</div><div class="stat-value" id="blockHeight">-</div></div>
+                    <div class="stat-box"><div class="stat-label">홀더</div><div class="stat-value" id="holderCount">-</div></div>
+                    <div class="stat-box"><div class="stat-label">진행률</div><div class="stat-value">100%</div></div>
+                    <div class="stat-box"><div class="stat-label">마지막 갱신</div><div style="font-size: 13px;" id="lastUpdate">-</div></div>
+                </div>
+            </header>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="지갑 주소 입력..." />
+                <button onclick="searchAddress()">🔍 검색</button>
+            </div>
+            <div class="controls">
+                <button onclick="downloadCSV()">📊 CSV</button>
+            </div>
+            <table>
+                <thead><tr><th>#</th><th>주소</th><th>잔액(MBC)</th><th>점유율</th><th>토큰</th></tr></thead>
+                <tbody id="tableBody"><tr><td colspan="5">로딩...</td></tr></tbody>
+            </table>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <div class="detail-page" id="detailPage">
+        <div class="container">
+            <button class="back-btn" onclick="goBack()">← 뒤로</button>
+            <div class="detail-header">
+                <div style="opacity:0.7; font-size:12px; margin-bottom:8px;">주소</div>
+                <div style="font-size: 15px; font-family: monospace; color: #00d4ff; word-break: break-all;" id="detailAddress"></div>
+            </div>
+            <div class="detail-stats">
+                <div class="detail-stat"><div style="opacity:0.7;font-size:12px;">MBC 거래 수</div><div style="font-size:18px;font-weight:bold;" id="detailTxCount">-</div></div>
+                <div class="detail-stat"><div style="opacity:0.7;font-size:12px;">보유 잔액</div><div style="font-size:18px;font-weight:bold;color:#00d4ff;" id="detailBalance">-</div></div>
+                <div class="detail-stat"><div style="opacity:0.7;font-size:12px;">총 수신</div><div style="font-size:18px;font-weight:bold;color:#4ade80;" id="detailReceived">-</div></div>
+                <div class="detail-stat"><div style="opacity:0.7;font-size:12px;">총 송신</div><div style="font-size:18px;font-weight:bold;color:#f87171;" id="detailSent">-</div></div>
+                <div class="detail-stat"><div style="opacity:0.7;font-size:12px;">순금액</div><div style="font-size:18px;font-weight:bold;" id="detailNet">-</div></div>
+            </div>
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('mbc')">💰 MBC 거래</button>
+                <button class="tab" onclick="switchTab('tokens')">🪙 레이어2 토큰</button>
+            </div>
+            <div id="mbcTab" class="tab-content active">
+                <table style="margin-top:20px;"><thead><tr><th>From</th><th>To</th><th>거래ID</th><th>수신(MBC)</th><th>송신(MBC)</th><th>순금액(MBC)</th><th>확인수</th><th>시간</th></tr></thead><tbody id="txTableBody"><tr><td colspan="8">로딩...</td></tr></tbody></table>
+            </div>
+            <div id="tokensTab" class="tab-content">
+                <div style="margin-top:20px;" id="tokensContainer">로딩...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allHolders = [];
+        let currentPage = 1;
+        const itemsPerPage = 100;
+
+        function formatNumber(num) {
+            return Number(num).toLocaleString('ko-KR', {minimumFractionDigits: 2, maximumFractionDigits: 8});
+        }
+
+        function formatDate(ts) {
+            if (!ts) return '-';
+            return new Date(ts * 1000).toLocaleString('ko-KR');
+        }
+
+        function showLoading(show, text) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (show) {
+                document.getElementById('loadingText').textContent = text || '로딩 중...';
+                overlay.classList.add('show');
+            } else {
+                overlay.classList.remove('show');
+            }
+        }
+
+        async function loadData() {
+            showLoading(true, '지갑 정보 로딩 중...');
+            const data = await fetch('/api/holders').then(r => r.json());
+            allHolders = data.holders || [];
+            document.getElementById('holderCount').textContent = (data.count || 0).toLocaleString();
+            document.getElementById('blockHeight').textContent = (data.blockHeight || '-').toLocaleString();
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('ko-KR');
+            showLoading(false);
+            currentPage = 1;
+            renderPage();
+            renderPagination();
+        }
+
+        async function getTokenInfo(addr) {
+            try {
+                const data = await fetch('/api/tokens/address/' + addr).then(r => r.json());
+                return (data.balances || []).filter(b => b.value > 0);
+            } catch(e) {
+                return [];
+            }
+        }
+
+        function renderPage() {
+            const start = (currentPage - 1) * itemsPerPage;
+            const pageData = allHolders.slice(start, start + itemsPerPage);
+            const totalBalance = allHolders.reduce((a,b) => a + b.balance, 0);
+
+            Promise.all(pageData.map(h => getTokenInfo(h.address))).then(tokensList => {
+                const html = pageData.map((h, i) => {
+                    const tokens = tokensList[i];
+                    let badgesHtml = '';
+                    if (tokens.length > 0) {
+                        badgesHtml = tokens.map(t => `<span class="token-badge" onclick="searchTokenTransfers('${h.address}', '${t.ticker}')">${t.ticker}</span>`).join('');
+                    }
+                    return `<tr><td>${start + i + 1}</td><td><span class="address" onclick="showDetail('${h.address}')">${h.address}</span></td><td>${formatNumber(h.balance / 100000000)}</td><td>${((h.balance / totalBalance) * 100).toFixed(4)}%</td><td>${badgesHtml}</td></tr>`;
+                }).join('');
+                document.getElementById('tableBody').innerHTML = html;
+            });
+        }
+
+        function renderPagination() {
+            const maxPages = Math.ceil(allHolders.length / itemsPerPage);
+            const p = document.getElementById('pagination');
+            p.innerHTML = '';
+            if (currentPage > 1) {
+                const b = document.createElement('button');
+                b.textContent = '⏮ 처음';
+                b.onclick = () => { currentPage = 1; renderPage(); renderPagination(); window.scrollTo(0,0); };
+                p.appendChild(b);
+            }
+            const s = Math.max(1, currentPage - 5);
+            const e = Math.min(maxPages, s + 9);
+            for (let i = s; i <= e; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i;
+                btn.classList.toggle('active', i === currentPage);
+                btn.onclick = () => { currentPage = i; renderPage(); renderPagination(); window.scrollTo(0,0); };
+                p.appendChild(btn);
+            }
+            if (currentPage < maxPages) {
+                const b = document.createElement('button');
+                b.textContent = '마지막 ⏭';
+                b.onclick = () => { currentPage = maxPages; renderPage(); renderPagination(); window.scrollTo(0,0); };
+                p.appendChild(b);
+            }
+            const sp = document.createElement('span');
+            sp.textContent = currentPage + ' / ' + maxPages;
+            p.appendChild(sp);
+        }
+
+        function searchAddress() {
+            const input = document.getElementById('searchInput').value.trim();
+            if (input) showDetail(input);
+        }
+
+        function searchTokenTransfers(address, ticker) {
+            showLoading(true, ticker + ' 거래 로딩 중...');
+            sessionStorage.setItem('lastPage', currentPage);
+            document.getElementById('detailAddress').textContent = address;
+            document.getElementById('listPage').classList.add('hide');
+            document.getElementById('detailPage').classList.add('show');
+            document.querySelectorAll('.tab')[1].classList.add('active');
+            document.querySelectorAll('.tab')[0].classList.remove('active');
+            document.getElementById('tokensTab').classList.add('active');
+            document.getElementById('mbcTab').classList.remove('active');
+            showTokenTransfers(address, ticker);
+            showLoading(false);
+        }
+
+        async function showDetail(address) {
+            showLoading(true, '거래 정보 로딩 중...');
+            sessionStorage.setItem('lastPage', currentPage);
+            document.getElementById('detailAddress').textContent = address;
+            document.getElementById('listPage').classList.add('hide');
+            document.getElementById('detailPage').classList.add('show');
+            window.scrollTo(0,0);
+
+            const data = await fetch('/api/address/' + address).then(r => r.json());
+            const holder = allHolders.find(h => h.address === address);
+
+            showLoading(false);
+
+            document.getElementById('detailTxCount').textContent = data.transactions.length;
+            document.getElementById('detailBalance').textContent = holder ? formatNumber(holder.balance / 100000000) + ' MBC' : '정보 없음';
+
+            const totalReceived = data.transactions.reduce((a,b) => a + b.received, 0);
+            const totalSent = data.transactions.reduce((a,b) => a + b.sent, 0);
+            const net = totalReceived - totalSent;
+
+            document.getElementById('detailReceived').textContent = formatNumber(totalReceived / 10000) + ' MBC';
+            document.getElementById('detailSent').textContent = formatNumber(totalSent / 10000) + ' MBC';
+            document.getElementById('detailNet').textContent = (net >= 0 ? '+' : '') + formatNumber(net / 10000) + ' MBC';
+
+            // 모든 거래 표시 (100개)
+            const html = data.transactions.slice(0, 100).map(function(tx) {
+                const net = tx.received - tx.sent;
+                const netClass = net >= 0 ? 'tx-in' : 'tx-out';
+                const netStr = (net >= 0 ? '+' : '') + formatNumber(net / 10000);
+                const fromAddr = tx.from && tx.from !== 'Unknown' ? tx.from : 'Unknown';
+                const toAddr = tx.to && tx.to !== 'Unknown' ? tx.to : 'Unknown';
+                return '<tr><td><span class="address" onclick="showDetail(\'' + fromAddr + '\')">' + fromAddr + '</span></td><td><span class="address" onclick="showDetail(\'' + toAddr + '\')">' + toAddr + '</span></td><td style="font-family:monospace;font-size:11px;">' + tx.txid.substring(0, 16) + '...</td><td class="tx-in">' + (tx.received > 0 ? formatNumber(tx.received / 10000) : '-') + '</td><td class="tx-out">' + (tx.sent > 0 ? formatNumber(tx.sent / 10000) : '-') + '</td><td class="' + netClass + '">' + netStr + '</td><td>' + tx.confirmations + '</td><td style="font-size:11px;">' + formatDate(tx.time) + '</td></tr>';
+            }).join('');
+
+            document.getElementById('txTableBody').innerHTML = html || '<tr><td colspan="8">거래 없음</td></tr>';
+
+            const tokenData = await fetch('/api/tokens/address/' + address).then(r => r.json());
+            const balances = (tokenData.balances || []).filter(b => b.value > 0);
+
+            document.getElementById('tokensContainer').innerHTML = balances.length === 0 ? '<div style="padding:20px;opacity:0.7">토큰 없음</div>' : balances.map(b => `<div style="background:#1a1f3a;padding:15px;border-radius:5px;cursor:pointer;margin-bottom:10px" onclick="showTokenTransfers('${address}', '${b.ticker}')"><div style="font-weight:bold;margin-bottom:5px">${b.ticker}</div><div style="color:#4ade80;font-size:16px">${formatNumber(b.value / Math.pow(10, b.decimals || 0))}</div></div>`).join('');
+        }
+
+        async function showTokenTransfers(address, ticker) {
+            const data = await fetch(`/api/tokens/transfers/${address}/${ticker}`).then(r => r.json());
+            const transfers = data.list || data.transfers || [];
+            const html = transfers.length === 0 ? `<div style="padding:20px;opacity:0.7">${ticker} 거래 없음</div>` : `<table style="margin-top:20px;width:100%;border-collapse:collapse"><thead><tr><th>🔄</th><th>From</th><th>To</th><th>금액</th><th>시간</th></tr></thead><tbody>${transfers.map(t => `<tr><td>🔄</td><td><span class="address" onclick="showDetail('${t.from || t.sender}')">${(t.from || t.sender).substring(0, 20)}...</span></td><td><span class="address" onclick="showDetail('${t.to || t.receiver}')">${(t.to || t.receiver).substring(0, 20)}...</span></td><td>${formatNumber((t.amount || t.value) / Math.pow(10, t.decimals || 0))} ${ticker}</td><td>${formatDate(t.time || t.timestamp)}</td></tr>`).join('')}</tbody></table>`;
+            document.getElementById('tokensContainer').innerHTML = html;
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Tab').classList.add('active');
+        }
+
+        function goBack() {
+            const lastPage = sessionStorage.getItem('lastPage');
+            if (lastPage) {
+                currentPage = parseInt(lastPage);
+            }
+            document.getElementById('listPage').classList.remove('hide');
+            document.getElementById('detailPage').classList.remove('show');
+            renderPage();
+            renderPagination();
+            window.scrollTo(0,0);
+        }
+
+        function downloadCSV() {
+            const totalBalance = allHolders.reduce((a,b) => a + b.balance, 0);
+            let csv = '순위,주소,잔액(MBC),점유율(%)\n';
+            allHolders.forEach((h, i) => {
+                csv += (i+1) + ',"' + h.address + '",' + formatNumber(h.balance/100000000) + ',' + ((h.balance/totalBalance)*100).toFixed(4) + '\n';
+            });
+            const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8;'});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'MicroBitcoin_Holders.csv';
+            link.click();
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', e => { if (e.key === 'Enter') searchAddress(); });
+        loadData();
+        setInterval(loadData, 30000);
+    </script>
+</body>
+</html>

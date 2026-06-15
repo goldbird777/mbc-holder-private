@@ -1,0 +1,17 @@
+[Unit]
+Description=MicroBitcoin Daemon
+After=network.target
+
+[Service]
+Type=forking
+User=ubuntu
+ExecStart=/usr/local/bin/microd -daemon -conf=/home/ubuntu/.microbitcoin/microbitcoin.conf -datadir=/home/ubuntu/.micro
+ExecStop=/usr/local/bin/micro-cli -datadir=/home/ubuntu/.micro -rpcport=18332 -rpcuser=myuser -rpcpassword=mypassword stop
+Restart=on-failure
+RestartSec=60
+TimeoutStartSec=1800
+TimeoutStopSec=300
+PIDFile=/home/ubuntu/.micro/microd.pid
+
+[Install]
+WantedBy=multi-user.target

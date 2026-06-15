@@ -1,0 +1,17 @@
+[Unit]
+Description=MBC Incremental Scanner
+After=microd.service
+Requires=microd.service
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu
+ExecStart=/usr/bin/node /home/ubuntu/incremental_scan.js
+Restart=on-failure
+RestartSec=30
+StandardOutput=append:/home/ubuntu/scan.log
+StandardError=append:/home/ubuntu/scan.log
+
+[Install]
+WantedBy=multi-user.target

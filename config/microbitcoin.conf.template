@@ -1,0 +1,19 @@
+server=1
+# 노드 연결 설정
+addnode=45.32.222.110
+addnode=172.105.110.158
+addnode=8.210.117.202
+addnode=103.20.192.140
+
+# RPC 외부 접속 허용 (중요)
+rpcbind=0.0.0.0
+rpcallowip=0.0.0.0/0
+rpcport=18332
+rpcuser=YOUR_RPC_USER
+rpcpassword=YOUR_RPC_PASSWORD
+txindex=1
+
+# === 메모리 최적화 (1GB RAM Oracle Free Tier) ===
+dbcache=100
+maxmempool=50
+maxorphantx=10
