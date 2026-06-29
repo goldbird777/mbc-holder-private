@@ -1,526 +1,1212 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MBC 블록체인 탐색기</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #0a0e27; color: #fff; }
-        .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
-        header { background: linear-gradient(135deg, #00d4ff, #0099cc); padding: 30px; border-radius: 10px; margin-bottom: 20px; }
-        h1 { font-size: 32px; margin-bottom: 10px; }
-        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px; }
-        .stat-box { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 5px; text-align: center; }
-        .stat-value { font-size: 24px; font-weight: bold; }
-        .stat-label { font-size: 12px; opacity: 0.9; margin-bottom: 8px; }
-        .search-box { background: #1a1f3a; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 10px; }
-        .search-box input { flex: 1; padding: 12px; background: #0a0e27; border: 2px solid #00d4ff; border-radius: 5px; color: #fff; font-size: 14px; font-family: monospace; }
-        .search-box button { padding: 12px 30px; background: #00d4ff; color: #000; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .controls { display: flex; gap: 10px; margin-bottom: 20px; }
-        button { padding: 10px 20px; background: #00d4ff; color: #000; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #00a8cc; }
-        table { width: 100%; border-collapse: collapse; background: #1a1f3a; border-radius: 5px; overflow: hidden; font-size: 13px; }
-        th { background: #0099cc; padding: 12px 10px; text-align: left; font-weight: bold; }
-        td { padding: 10px; border-bottom: 1px solid #2a2f4a; word-break: break-all; }
-        tr:hover { background: #2a2f4a; }
-        .address { color: #00d4ff; cursor: pointer; text-decoration: underline; font-family: monospace; font-size: 12px; }
-        .token-badge { background: #4ade80; color: #000; padding: 4px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; cursor: pointer; }
-        .pagination { display: flex; gap: 5px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
-        .pagination button { padding: 8px 12px; min-width: 40px; font-size: 12px; }
-        .pagination button.active { background: #00a8cc; }
-        .detail-page { display: none; }
-        .detail-page.show { display: block; }
-        .list-page.hide { display: none; }
-        .back-btn { background: #666; margin-bottom: 20px; }
-        .back-btn:hover { background: #888; }
-        .detail-header { background: #1a1f3a; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #00d4ff; }
-        .detail-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-top: 15px; }
-        .detail-stat { background: rgba(0,212,255,0.1); padding: 15px; border-radius: 5px; }
-        .tabs { display: flex; gap: 0; margin-top: 20px; border-bottom: 2px solid #2a2f4a; }
-        .tab { padding: 12px 30px; background: #1a1f3a; color: #999; cursor: pointer; border: none; font-weight: bold; }
-        .tab.active { background: #0099cc; color: #fff; border-bottom: 3px solid #00d4ff; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .tx-in { color: #4ade80; font-weight: bold; }
-        .tx-out { color: #f87171; font-weight: bold; }
-        .self-transfer { color: #f59e0b; font-size: 11px; }
-        .breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 12px; color: #888; flex-wrap: wrap; }
-        .breadcrumb .bc-link { color: #00d4ff; font-family: monospace; cursor: pointer; }
-        .breadcrumb .bc-link:hover { text-decoration: underline; }
-        .breadcrumb .bc-sep { color: #555; }
-        .breadcrumb .bc-current { color: #fff; font-family: monospace; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>MBC 홀더 리스트 - 전체 활성 지갑 잔액 | MicroBitcoin 탐색기</title>
+<meta name="description" content="MicroBitcoin(MBC) 네트워크 전체 25,000명 이상 활성 홀더 리스트와 잔액, 토큰 보유 현황을 실시간 조회.">
+<meta name="keywords" content="MicroBitcoin, MBC, 마이크로비트코인, 홀더, 채굴, 블록체인, 탐색기, 거래소, Wonpay, 풀노드, 잔액">
+<meta name="author" content="MBC Holder Explorer">
+<link rel="canonical" href="https://microbitcoin.co.kr/holders">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MicroBitcoin 홀더 탐색기">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:title" content="MBC 홀더 리스트 - 전체 활성 지갑 잔액 | MicroBitcoin 탐색기">
+<meta property="og:description" content="MicroBitcoin(MBC) 네트워크 전체 25,000명 이상 활성 홀더 리스트와 잔액, 토큰 보유 현황을 실시간 조회.">
+<meta property="og:url" content="https://microbitcoin.co.kr/holders">
+<meta name="twitter:card" content="summary">
+
+<!-- Google AdSense (사이트 소유권 인증용 — 3가지 방법 모두 적용) -->
+<meta name="google-adsense-account" content="ca-pub-1823621340722350">
+<!-- Google Search Console (URL 접두어 속성 인증용) -->
+<meta name="google-site-verification" content="PR09nIpp1oDLY4U60yHvoW30qaEshInzp8uqUCzZk3w">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1823621340722350" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="/assets/app.css?v=1">
 </head>
 <body>
-    <div class="list-page" id="listPage">
-        <div class="container">
-            <header>
-                <h1>&#9889; MicroBitcoin 탐색기</h1>
-                <div class="stats">
-                    <div class="stat-box"><div class="stat-label">블록</div><div class="stat-value" id="blockHeight">-</div></div>
-                    <div class="stat-box"><div class="stat-label">홀더</div><div class="stat-value" id="holderCount">-</div></div>
-                    <div class="stat-box"><div class="stat-label">진행률</div><div class="stat-value">100%</div></div>
-                    <div class="stat-box"><div class="stat-label">마지막 갱신</div><div style="font-size: 13px;" id="lastUpdate">-</div></div>
-                </div>
-            </header>
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="지갑 주소 입력..." />
-                <button onclick="searchAddress()">&#128269; 검색</button>
-            </div>
-            <div class="controls">
-                <button onclick="downloadCSV()">&#128202; CSV</button>
-            </div>
-            <table>
-                <thead><tr><th>#</th><th>주소</th><th>잔액(MBC)</th><th>점유율</th><th>토큰</th></tr></thead>
-                <tbody id="tableBody"><tr><td colspan="5">로딩...</td></tr></tbody>
-            </table>
-            <div class="pagination" id="pagination"></div>
-        </div>
+
+<!-- ── 헤더 ── -->
+<header>
+  <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">☰</button>
+  <a class="brand" onclick="navigate('holders'); return false;">
+    <img class="brand-logo" src="/assets/mbc-logo.png" alt="MicroBitcoin" style="object-fit:contain;">
+    <div>
+      <h1 data-i18n="site_title">MicroBitcoin 홀더 탐색기</h1>
+      <span class="sub" data-i18n="site_sub">전체 홀더 · 잔액 · 토큰 보유 현황</span>
     </div>
+  </a>
+  <div class="lang-toggle">
+    <button id="lang-kor" class="active" onclick="setLang('ko')">KOR</button>
+    <button id="lang-eng" onclick="setLang('en')">ENG</button>
+  </div>
+  <div class="nav">
+    <a href="https://microbitcoin.org" target="_blank" class="external" data-i18n="nav_official">공식 사이트</a>
+    <a href="https://github.com/MicroBitcoinOrg" target="_blank" class="external">GitHub</a>
+  </div>
+</header>
 
-    <div class="detail-page" id="detailPage">
-        <div class="container">
-            <div class="breadcrumb" id="breadcrumb"></div>
-            <button class="back-btn" onclick="goBack()">&#8592; 뒤로</button>
-            <div class="detail-header">
-                <div style="opacity:0.7; font-size:12px; margin-bottom:8px;">주소</div>
-                <div style="font-size: 15px; font-family: monospace; color: #00d4ff; word-break: break-all;" id="detailAddress"></div>
-            </div>
-            <div class="detail-stats">
-                <div class="detail-stat"><div style="opacity:0.7;font-size:12px;">MBC 거래 수</div><div style="font-size:18px;font-weight:bold;" id="detailTxCount">-</div></div>
-                <div class="detail-stat"><div style="opacity:0.7;font-size:12px;">보유 잔액</div><div style="font-size:18px;font-weight:bold;color:#00d4ff;" id="detailBalance">-</div></div>
-                <div class="detail-stat"><div style="opacity:0.7;font-size:12px;">총 수신</div><div style="font-size:18px;font-weight:bold;color:#4ade80;" id="detailReceived">-</div></div>
-                <div class="detail-stat"><div style="opacity:0.7;font-size:12px;">총 송신</div><div style="font-size:18px;font-weight:bold;color:#f87171;" id="detailSent">-</div></div>
-                <div class="detail-stat"><div style="opacity:0.7;font-size:12px;">순금액</div><div style="font-size:18px;font-weight:bold;" id="detailNet">-</div></div>
-            </div>
-            <div class="tabs">
-                <button class="tab active" id="tabMbc" onclick="switchTab('mbc', this)">&#128176; MBC 거래</button>
-                <button class="tab" id="tabTokens" onclick="switchTab('tokens', this)">&#129689; 레이어2 토큰</button>
-            </div>
-            <div id="mbcTab" class="tab-content active">
-                <table style="margin-top:20px;"><thead><tr><th>From</th><th>To</th><th>거래ID</th><th>수신(MBC)</th><th>송신(MBC)</th><th>순금액(MBC)</th><th>확인수</th><th>시간</th></tr></thead>
-                <tbody id="txTableBody"><tr><td colspan="8">로딩...</td></tr></tbody></table>
-            </div>
-            <div id="tokensTab" class="tab-content">
-                <div style="margin-top:20px;" id="tokensContainer">로딩...</div>
-            </div>
-        </div>
+<!-- ── 상단 sticky 광고 배너 ── -->
+<div class="top-ad-bar">
+  <div class="ad-inner">
+    <span class="ad-label" data-i18n="ad_label">광고</span>
+    <div data-i18n="ad_top">상단 가로 배너 (970×90 또는 자동 반응형)</div>
+  </div>
+</div>
+
+<!-- ── 서버 운영 후원 (3채널: BTC / MBC / USDT-TRC20) ── -->
+<div id="donateBar" style="background:#FFF8E1; border-bottom:1px solid #FFE082; padding:8px 12px; display:flex; justify-content:center; position:fixed; top:178px; left:0; right:0; z-index:97;">
+  <div style="max-width:1100px; width:100%; display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:13px;">
+    <span style="font-size:16px;">☕</span>
+    <span style="color:#6D4C00; font-weight:600; font-size:12px;">사이트 운영 후원:</span>
+    <div id="donateTabs" style="display:flex; gap:4px; border:1px solid #FFE082; border-radius:6px; overflow:hidden; background:#fff;">
+      <button class="donate-tab active" data-key="btc" onclick="switchDonateTab('btc')" style="padding:5px 10px; border:none; background:var(--mbc-navy); color:#fff; font-size:11px; font-weight:700; cursor:pointer;">BTC</button>
+      <button class="donate-tab" data-key="mbc" onclick="switchDonateTab('mbc')" style="padding:5px 10px; border:none; background:#fff; color:var(--mbc-navy); font-size:11px; font-weight:700; cursor:pointer;">MBC</button>
+      <button class="donate-tab" data-key="usdt" onclick="switchDonateTab('usdt')" style="padding:5px 10px; border:none; background:#fff; color:var(--mbc-navy); font-size:11px; font-weight:700; cursor:pointer;">USDT</button>
     </div>
+    <code id="donateAddr" style="background:#fff; border:1px solid #FFE082; padding:4px 10px; border-radius:6px; font-family:'Consolas',monospace; font-size:11px; color:var(--mbc-navy); cursor:pointer; user-select:all; word-break:break-all; flex:1; min-width:0;" onclick="copyDonate()">불러오는 중…</code>
+    <span id="donateNetwork" style="font-size:10px; color:#9AA1B0; font-weight:600;"></span>
+    <button onclick="copyDonate()" style="background:var(--mbc-navy); color:#fff; border:none; padding:5px 11px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">📋</button>
+    <span id="donateOk" style="color:#2E7D32; font-size:11px; font-weight:700; opacity:0; transition:opacity .3s;">✓ 복사됨</span>
+  </div>
+</div>
 
-    <script>
-        var allHolders = [];
-        var currentPage = 1;
-        var itemsPerPage = 100;
+<!-- ── 레이아웃 ── -->
+<div class="layout">
 
-        // 네비게이션 히스토리 스택 - 각 항목: { address, tab }
-        var navHistory = [];
+<div class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+<nav class="sidebar" id="sidebar">
+  <button class="sidebar-close" onclick="toggleMobileSidebar()" aria-label="메뉴 닫기">✕</button>
+  <div class="sidebar-toggle" onclick="toggleSidebar()">
+    <span class="toggle-icon" id="toggleIcon">◀</span>
+  </div>
+  <div class="menu-section">
+    <div class="menu-label" data-i18n="menu_explore">탐색</div>
+    <a class="menu-item active" data-page="holders" onclick="navigate('holders'); return false;">
+      <span class="m-icon">📋</span>
+      <span class="m-text" data-i18n="menu_holders">홀더 리스트</span>
+    </a>
+    <a class="menu-item" data-page="transfers" onclick="navigate('transfers'); return false;">
+      <span class="m-icon">📤</span>
+      <span class="m-text" data-i18n="menu_transfers">최근 트랜잭션</span>
+    </a>
+    <a class="menu-item" data-page="whales" onclick="navigate('whales'); return false;">
+      <span class="m-icon">🐳</span>
+      <span class="m-text">Whale Alert</span>
+    </a>
+    <a class="menu-item" data-page="search" onclick="navigate('search'); return false;">
+      <span class="m-icon">🔍</span>
+      <span class="m-text" data-i18n="menu_search">주소 검색</span>
+    </a>
+  </div>
+  <div class="menu-section">
+    <div class="menu-label" data-i18n="menu_stats_label">통계</div>
+    <a class="menu-item" data-page="stats" onclick="navigate('stats'); return false;">
+      <span class="m-icon">📊</span>
+      <span class="m-text" data-i18n="menu_stats">전체 통계</span>
+    </a>
+    <a class="menu-item" href="https://miningpoolstats.stream/microbitcoin" target="_blank" rel="noopener">
+      <span class="m-icon">⚡</span>
+      <span class="m-text" data-i18n="menu_hashrate">해시레이트 ↗</span>
+    </a>
+  </div>
+  <div class="menu-section">
+    <div class="menu-label">커뮤니티</div>
+    <a class="menu-item" data-page="news" onclick="navigate('news'); return false;">
+      <span class="m-icon">📰</span>
+      <span class="m-text">최근 소식</span>
+    </a>
+    <a class="menu-item" data-page="qna" onclick="navigate('qna'); return false;">
+      <span class="m-icon">❓</span>
+      <span class="m-text">Q&amp;A</span>
+    </a>
+    <a class="menu-item" data-page="links" onclick="navigate('links'); return false;">
+      <span class="m-icon">🔗</span>
+      <span class="m-text">관련 사이트</span>
+    </a>
+  </div>
+  <div class="menu-section">
+    <div class="menu-label" data-i18n="menu_guide">가이드</div>
+    <a class="menu-item" data-page="mining" onclick="navigate('mining'); return false;">
+      <span class="m-icon">⛏️</span>
+      <span class="m-text" data-i18n="menu_mining">채굴 방법 소개</span>
+    </a>
+    <a class="menu-item" data-page="exchanges" onclick="navigate('exchanges'); return false;">
+      <span class="m-icon">💱</span>
+      <span class="m-text" data-i18n="menu_exchanges">상장 거래소</span>
+    </a>
+    <a class="menu-item" data-page="wonpay" onclick="navigate('wonpay'); return false;">
+      <img class="m-icon" src="https://play-lh.googleusercontent.com/H75_jjSp7mD58bxrV2P6iFmgo-CJG6P8pSHHzO7occnac-arjBdy3HwVWhNchMjY8beZlMxUnIK-zpfSV8OFZg=w240-h480-rw" alt="Wonpay" style="width:22px; height:22px; border-radius:5px; object-fit:cover; flex-shrink:0;" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'m-icon',textContent:'👛'}))">
+      <span class="m-text" data-i18n="menu_wonpay">원페이 지갑</span>
+    </a>
+    <a class="menu-item" data-page="tokens" onclick="navigate('tokens'); return false;">
+      <span class="m-icon">🪙</span>
+      <span class="m-text">MBC 레이어2 토큰</span>
+    </a>
+  </div>
+  <div class="menu-section">
+    <div class="menu-label">외부 링크</div>
+    <a class="menu-item" href="https://microbitcoin.org" target="_blank" rel="noopener">
+      <img class="m-icon" src="/assets/mbc-logo.png" alt="MicroBitcoin" style="width:22px; height:22px; border-radius:50%; background:#fff; padding:1px; object-fit:contain; flex-shrink:0;">
+      <span class="m-text">공식 사이트 ↗</span>
+    </a>
+    <a class="menu-item" href="https://github.com/MicroBitcoinOrg" target="_blank" rel="noopener">
+      <svg class="m-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" style="flex-shrink:0;"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      <span class="m-text">GitHub ↗</span>
+    </a>
+  </div>
+  <div class="menu-section">
+    <div class="menu-label" data-i18n="menu_info">정보</div>
+    <a class="menu-item" data-page="about" onclick="navigate('about'); return false;">
+      <span class="m-icon">ℹ️</span>
+      <span class="m-text" data-i18n="menu_about">사이트 소개</span>
+    </a>
+    <a class="menu-item" data-page="privacy" onclick="navigate('privacy'); return false;">
+      <span class="m-icon">🔒</span>
+      <span class="m-text" data-i18n="menu_privacy">개인정보처리방침</span>
+    </a>
+    <a class="menu-item" data-page="contact" onclick="navigate('contact'); return false;">
+      <span class="m-icon">✉️</span>
+      <span class="m-text" data-i18n="menu_contact">문의</span>
+    </a>
+  </div>
 
-        // 토큰 배치 로딩용
-        var tokenLoadQueue = [];
-        var tokenLoadTimer = null;
+  <div class="sidebar-footer">
+    © 2026 MBC Holder Explorer
+    <div style="margin-top:8px;">
+      <a href="/admin.html" target="_blank" rel="noopener" title="관리자 로그인"
+         style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; background:rgba(255,255,255,.06); color:#7A6FA0; border-radius:5px; text-decoration:none; font-size:11px; transition:background .15s, color .15s;"
+         onmouseover="this.style.background='rgba(255,255,255,.14)';this.style.color='#fff';"
+         onmouseout="this.style.background='rgba(255,255,255,.06)';this.style.color='#7A6FA0';">
+        🔒 관리자
+      </a>
+    </div>
+  </div>
+</nav>
 
-        function formatNumber(num) {
-            return Number(num).toLocaleString('ko-KR', {minimumFractionDigits: 2, maximumFractionDigits: 8});
-        }
+<!-- 메인 영역 -->
+<div class="main-wrap">
+<div class="main-content">
+  <div class="container">
 
-        function formatDate(ts) {
-            if (!ts) return '-';
-            return new Date(ts * 1000).toLocaleString('ko-KR');
-        }
+    <!-- ─────────────── 페이지 0: 지갑 상세 (숨김, 클릭시만 표시) ─────────────── -->
+    <section class="page-section" id="page-detail">
+      <a onclick="navigate('holders'); return false;" style="display:inline-flex; align-items:center; gap:6px; color:var(--mbc-navy); cursor:pointer; font-size:13px; font-weight:600; margin-bottom:14px; text-decoration:none;">← 목록으로</a>
 
-        function shortAddr(addr) {
-            if (!addr || addr.length < 16) return addr;
-            return addr.substring(0, 8) + '...' + addr.substring(addr.length - 6);
-        }
+      <div class="static-card" style="margin-bottom:18px;">
+        <div style="font-size:12px; color:var(--text-sub); margin-bottom:6px; font-weight:600;">지갑 주소</div>
+        <div id="detailAddress" style="font-family:'Consolas','Monaco',monospace; font-size:17px; font-weight:700; color:var(--mbc-navy); word-break:break-all; overflow-wrap:break-word; line-height:1.5; margin-bottom:18px; background:#F8F9FC; padding:14px 16px; border-radius:8px; border:1px solid var(--border);">-</div>
 
-        function escapeHtml(str) {
-            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-        }
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">
+          <div style="background:var(--bg-soft); padding:14px 16px; border-radius:8px;">
+            <div style="font-size:11px; color:var(--text-sub); margin-bottom:4px;">잔액</div>
+            <div style="display:flex; align-items:baseline; gap:6px; flex-wrap:wrap;">
+              <div id="detailBalance" style="font-size:17px; font-weight:800; color:var(--mbc-navy); word-break:break-all; line-height:1.2;">-</div>
+              <span style="font-size:11px; color:var(--text-sub); font-weight:600;">MBC</span>
+            </div>
+          </div>
+          <div style="background:var(--bg-soft); padding:14px 16px; border-radius:8px;">
+            <div style="font-size:11px; color:var(--text-sub); margin-bottom:4px;">순위</div>
+            <div id="detailRank" style="font-size:20px; font-weight:800; color:var(--mbc-gold); line-height:1.2;">-</div>
+          </div>
+          <div style="background:var(--bg-soft); padding:14px 16px; border-radius:8px;">
+            <div style="font-size:11px; color:var(--text-sub); margin-bottom:4px;">점유율</div>
+            <div id="detailPercent" style="font-size:20px; font-weight:800; color:var(--mbc-blue); line-height:1.2;">-</div>
+          </div>
+          <div style="background:var(--bg-soft); padding:14px 16px; border-radius:8px;">
+            <div style="font-size:11px; color:var(--text-sub); margin-bottom:4px;">거래 횟수</div>
+            <div id="detailTxCount" style="font-size:20px; font-weight:800; color:var(--mbc-accent); line-height:1.2;">-</div>
+          </div>
+          <div style="background:#E8F5E9; padding:14px 16px; border-radius:8px;">
+            <div style="font-size:11px; color:#2E7D32; margin-bottom:4px;">총 수신</div>
+            <div style="display:flex; align-items:baseline; gap:6px; flex-wrap:wrap;">
+              <div id="detailReceived" style="font-size:15px; font-weight:800; color:#2E7D32; word-break:break-all; line-height:1.2;">-</div>
+              <span style="font-size:11px; color:#2E7D32; font-weight:600;">MBC</span>
+            </div>
+          </div>
+          <div style="background:#FFEBEE; padding:14px 16px; border-radius:8px;">
+            <div style="font-size:11px; color:#C62828; margin-bottom:4px;">총 송신</div>
+            <div style="display:flex; align-items:baseline; gap:6px; flex-wrap:wrap;">
+              <div id="detailSent" style="font-size:15px; font-weight:800; color:#C62828; word-break:break-all; line-height:1.2;">-</div>
+              <span style="font-size:11px; color:#C62828; font-weight:600;">MBC</span>
+            </div>
+          </div>
+          <div style="background:#FFF8E1; padding:14px 16px; border-radius:8px;">
+            <div style="font-size:11px; color:#6D4C00; margin-bottom:4px;">순금액</div>
+            <div style="display:flex; align-items:baseline; gap:6px; flex-wrap:wrap;">
+              <div id="detailNet" style="font-size:15px; font-weight:800; color:#6D4C00; word-break:break-all; line-height:1.2;">-</div>
+              <span style="font-size:11px; color:#6D4C00; font-weight:600;">MBC</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        // ── 브레드크럼 ──────────────────────────────────────────
-        function renderBreadcrumb() {
-            var bc = document.getElementById('breadcrumb');
-            if (navHistory.length <= 1) { bc.innerHTML = ''; return; }
-            var html = '<span class="bc-link" onclick="goHome()">목록</span>';
-            for (var i = 0; i < navHistory.length; i++) {
-                html += '<span class="bc-sep"> › </span>';
-                if (i < navHistory.length - 1) {
-                    (function(idx) {
-                        html += '<span class="bc-link" onclick="jumpHistory(' + idx + ')">' + escapeHtml(shortAddr(navHistory[idx].address)) + '</span>';
-                    })(i);
-                } else {
-                    html += '<span class="bc-current">' + escapeHtml(shortAddr(navHistory[i].address)) + '</span>';
-                }
-            }
-            bc.innerHTML = html;
-        }
+      <div style="display:flex; gap:0; border-bottom:2px solid var(--border); margin-bottom:16px;">
+        <button class="tab-btn active" id="tabMbc" onclick="switchTab('mbc')" style="padding:10px 22px; background:var(--mbc-navy); color:#fff; border:none; cursor:pointer; font-weight:700; font-size:13px; border-radius:8px 8px 0 0;">💰 MBC 거래</button>
+        <button class="tab-btn" id="tabTokens" onclick="switchTab('tokens')" style="padding:10px 22px; background:#fff; color:var(--mbc-navy); border:none; cursor:pointer; font-weight:700; font-size:13px; border-radius:8px 8px 0 0;">🪙 레이어2 토큰</button>
+      </div>
 
-        function jumpHistory(index) {
-            navHistory = navHistory.slice(0, index + 1);
-            var target = navHistory[navHistory.length - 1];
-            _loadDetail(target.address, target.tab || 'mbc');
-        }
+      <div id="mbcTab" class="tab-content" style="display:block;">
+        <div class="table-card" style="overflow-x:auto;">
+          <table style="min-width:1320px; width:100%;">
+            <thead>
+              <tr>
+                <th style="min-width:260px;">From</th>
+                <th style="min-width:260px;">To</th>
+                <th style="width:130px; white-space:nowrap;">거래 ID</th>
+                <th class="right" style="width:160px; white-space:nowrap;">수신 (MBC)</th>
+                <th class="right" style="width:160px; white-space:nowrap;">송신 (MBC)</th>
+                <th class="right" style="width:160px; white-space:nowrap;">순금액 (MBC)</th>
+                <th class="center" style="width:80px; white-space:nowrap;">확인수</th>
+                <th class="center" style="width:150px; white-space:nowrap;">시간</th>
+              </tr>
+            </thead>
+            <tbody id="txTableBody">
+              <tr><td colspan="8" style="text-align:center; padding:30px; color:#999;">로딩 중…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-        function goHome() {
-            navHistory = [];
-            showListPage();
-        }
+      <div id="tokensTab" class="tab-content" style="display:none;">
+        <div id="tokensContainer" class="static-card">로딩 중…</div>
+      </div>
+    </section>
 
-        // ── 페이지 전환 ─────────────────────────────────────────
-        function showListPage() {
-            document.getElementById('listPage').classList.remove('hide');
-            document.getElementById('detailPage').classList.remove('show');
-            var saved = sessionStorage.getItem('lastPage');
-            if (saved) currentPage = parseInt(saved);
-            renderPage();
-            renderPagination();
-            window.scrollTo(0, 0);
-        }
+    <!-- ─────────────── 페이지 1: 홀더 리스트 ─────────────── -->
+    <section class="page-section active" id="page-holders">
+      <div class="page-title">📋 <span data-i18n="page_holders_title">홀더 리스트</span></div>
+      <div class="page-subtitle" data-i18n="page_holders_sub">MicroBitcoin 네트워크의 전체 활성 홀더를 잔액 기준으로 표시합니다</div>
 
-        function showDetailPage() {
-            document.getElementById('listPage').classList.add('hide');
-            document.getElementById('detailPage').classList.add('show');
-            window.scrollTo(0, 0);
-        }
+      <div class="summary-grid">
+        <div class="s-card navy">
+          <div class="lbl" data-i18n="stat_block">현재 블록</div>
+          <div class="num" id="stat-block">-</div>
+          <div class="updated" data-i18n="stat_block_sub">실시간 동기화</div>
+        </div>
+        <div class="s-card blue">
+          <div class="lbl" data-i18n="stat_holders">전체 홀더</div>
+          <div class="num" id="stat-holders">-</div>
+          <div class="updated" data-i18n="stat_holders_sub">활성 주소</div>
+        </div>
+        <div class="s-card green">
+          <div class="lbl" data-i18n="stat_progress">진행률</div>
+          <div class="num">100%</div>
+          <div class="updated" data-i18n="stat_progress_sub">동기화 완료</div>
+        </div>
+        <div class="s-card gold">
+          <div class="lbl" data-i18n="stat_visitors">오늘 방문자</div>
+          <div class="num" id="stat-visitors">-</div>
+          <div class="updated" data-i18n="stat_visitors_sub">unique IP 기준</div>
+        </div>
+        <div class="s-card gray">
+          <div class="lbl" data-i18n="stat_updated">마지막 갱신</div>
+          <div class="num" id="stat-updated" style="font-size:16px;">-</div>
+          <div class="updated" data-i18n="stat_updated_sub">5분 주기 자동</div>
+        </div>
+      </div>
 
-        // ── 주소 상세 (목록에서 진입) ────────────────────────────
-        function showDetail(address) {
-            sessionStorage.setItem('lastPage', currentPage);
-            // 목록에서 진입 시 히스토리 초기화
-            if (!document.getElementById('detailPage').classList.contains('show')) {
-                navHistory = [];
-            }
-            navHistory.push({ address: address, tab: 'mbc' });
-            _loadDetail(address, 'mbc');
-            showDetailPage();
-        }
+      <div class="search-card" style="padding:14px 16px; margin-bottom:14px;">
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <span style="font-size:13px; color:var(--mbc-navy); font-weight:700;">🔍 지갑 주소 검색</span>
+          <input type="text" id="holdersInlineSearch" placeholder="B / b / mbc1q 로 시작하는 주소 입력 후 Enter" autocomplete="off"
+                 style="flex:1; min-width:200px; padding:9px 12px; background:var(--bg-soft); border:1.5px solid var(--border); border-radius:6px; font-size:13px; font-family:'Consolas',monospace; outline:none;"
+                 onkeydown="if(event.key==='Enter') holdersInlineSearchGo()">
+          <button onclick="holdersInlineSearchGo()" style="padding:9px 18px; background:var(--mbc-navy); color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:700; font-size:13px;">검색</button>
+        </div>
+      </div>
 
-        // ── 상세에서 다른 주소 클릭 (히스토리 쌓기) ─────────────
-        function drillDetail(address) {
-            navHistory.push({ address: address, tab: 'mbc' });
-            _loadDetail(address, 'mbc');
-            window.scrollTo(0, 0);
-        }
+      <div class="controls-bar">
+        <div class="control-info">
+          <span data-i18n="ctrl_total">총</span> <strong id="totalCount">0</strong><span data-i18n="ctrl_total_unit">개 홀더 · 페이지</span> <strong id="currentPage">1</strong> / <strong id="totalPages">1</strong>
+        </div>
+        <button class="btn-csv" onclick="downloadCSV()">📥 <span data-i18n="ctrl_csv">CSV 다운로드</span></button>
+      </div>
 
-        // ── 실제 데이터 로드 ────────────────────────────────────
-        function _loadDetail(address, defaultTab) {
-            // 즉시 로딩 상태 표시
-            document.getElementById('detailAddress').textContent = address;
-            document.getElementById('detailTxCount').textContent = '-';
-            document.getElementById('detailBalance').textContent = '-';
-            document.getElementById('detailReceived').textContent = '-';
-            document.getElementById('detailSent').textContent = '-';
-            document.getElementById('detailNet').textContent = '-';
-            document.getElementById('txTableBody').innerHTML = '<tr><td colspan="8">로딩 중...</td></tr>';
-            document.getElementById('tokensContainer').innerHTML = '로딩 중...';
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th class="center" style="width:60px;">#</th>
+              <th data-i18n="th_address">지갑 주소</th>
+              <th class="right" data-i18n="th_balance">잔액 (MBC)</th>
+              <th class="right" style="width:90px;" data-i18n="th_percent">점유율</th>
+              <th class="center" style="width:200px;" data-i18n="th_tokens">토큰</th>
+            </tr>
+          </thead>
+          <tbody id="holdersBody">
+            <tr><td colspan="5" style="text-align:center; padding:30px; color:#999;" data-i18n="loading">불러오는 중…</td></tr>
+          </tbody>
+        </table>
+      </div>
 
-            switchTabByName(defaultTab || 'mbc');
-            renderBreadcrumb();
+      <div class="pagination" id="pagination"></div>
+    </section>
 
-            var currentAddr = address; // 클로저용 캡처
+    <!-- ─────────────── 페이지: 최근 트랜잭션 (etherscan 스타일) ─────────────── -->
+    <section class="page-section" id="page-transfers">
+      <div class="page-title">📤 <span>트랜잭션 탐색</span></div>
+      <div class="page-subtitle">채굴(coinbase) 제외, 전체 지갑 간 이동 내역 · 옛 블록부터 점진적 누적 중</div>
 
-            // MBC 거래 로드
-            fetch('/api/address/' + address)
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    // 다른 주소로 이동한 경우 무시
-                    if (document.getElementById('detailAddress').textContent !== currentAddr) return;
+      <div class="summary-grid">
+        <div class="s-card navy">
+          <div class="lbl">최신 블록</div>
+          <div class="num" id="tx-latest" style="font-size:18px;">-</div>
+          <div class="updated">DB 기준</div>
+        </div>
+        <div class="s-card blue">
+          <div class="lbl">총 트랜잭션</div>
+          <div class="num" id="tx-total" style="font-size:18px;">-</div>
+          <div class="updated">채굴 제외</div>
+        </div>
+        <div class="s-card green">
+          <div class="lbl">풀스캔 진행</div>
+          <div class="num" id="tx-progress" style="font-size:16px;">-</div>
+          <div class="updated">옛 블록 채우는 중</div>
+        </div>
+        <div class="s-card gold">
+          <div class="lbl">가장 옛 블록</div>
+          <div class="num" id="tx-earliest" style="font-size:18px;">-</div>
+          <div class="updated">DB 시작점</div>
+        </div>
+        <div class="s-card gray">
+          <div class="lbl">마지막 갱신</div>
+          <div class="num" id="tx-updated" style="font-size:16px;">-</div>
+          <div class="updated">자동</div>
+        </div>
+      </div>
 
-                    var holder = allHolders.find(function(h) { return h.address === currentAddr; });
-                    document.getElementById('detailTxCount').textContent = data.transactions.length;
-                    document.getElementById('detailBalance').textContent = holder
-                        ? formatNumber(holder.balance / 100000000) + ' MBC'
-                        : '정보 없음';
+      <div class="search-card" style="padding:14px 16px; margin-bottom:14px;">
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <span style="font-size:13px; color:var(--mbc-navy); font-weight:700;">🔍 주소 필터</span>
+          <input type="text" id="txFilterAddress" placeholder="B / b / mbc1q 로 시작 (예: mbc1qdhqf0...)" autocomplete="off"
+                 style="flex:1; min-width:200px; padding:9px 12px; background:var(--bg-soft); border:1.5px solid var(--border); border-radius:6px; font-size:13px; font-family:'Consolas',monospace; outline:none;"
+                 onkeydown="if(event.key==='Enter') applyTxFilters()">
+          <label style="display:inline-flex; align-items:center; gap:6px; font-size:13px; cursor:pointer;" title="채굴풀이 채굴자에게 분배하는 송금을 제외합니다.">
+            <input type="checkbox" id="txExcludePool" onchange="applyTxFilters()" style="cursor:pointer;">
+            <span>🏊 풀 분배 제외</span>
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:var(--text-sub); color:#fff; border-radius:50%; font-size:11px; font-weight:700; cursor:help;" data-tip="채굴풀이 채굴자에게 분배하는 송금을 제외합니다.&#10;&#10;• 풀 주소는 어드민 페이지에서 등록한 주소 기준&#10;• 현재 등록된 풀이 없으면 결과는 동일">ⓘ</span>
+          </label>
+          <label style="display:inline-flex; align-items:center; gap:6px; font-size:13px; cursor:pointer;" title="설정한 금액 미만의 자투리 송금을 결과에서 제외합니다.">
+            <input type="checkbox" id="txExcludeDust" onchange="applyTxFilters()" style="cursor:pointer;">
+            <span>💰 소액 제외</span>
+            <input type="number" id="txDustThreshold" value="1" min="0" step="0.0001" onchange="if(document.getElementById('txExcludeDust').checked) applyTxFilters()"
+                   style="width:64px; padding:4px 6px; background:var(--bg-soft); border:1.5px solid var(--border); border-radius:4px; font-size:12px; text-align:right;">
+            <span style="font-size:12px; color:var(--text-sub);">MBC 미만</span>
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:var(--text-sub); color:#fff; border-radius:50%; font-size:11px; font-weight:700; cursor:help;" data-tip="설정한 금액 미만의 송금을 결과에서 제외합니다.&#10;&#10;• 기본값 1 MBC&#10;• 풀 분배의 자투리, 거스름돈 잔액 등 정리에 유용&#10;• 풀 분배 제외와 같이 켜면 깨끗한 일반 송금만 표시">ⓘ</span>
+          </label>
+          <button id="txApplyBtn" onclick="applyTxFilters()" style="padding:9px 18px; background:var(--mbc-navy); color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:700; font-size:13px;">적용</button>
+          <button onclick="resetTxFilters()" style="padding:9px 14px; background:#fff; color:var(--text-sub); border:1.5px solid var(--border); border-radius:6px; cursor:pointer; font-weight:700; font-size:13px;">초기화</button>
+        </div>
+        <div id="txFilterMsg" style="display:none; margin-top:10px; padding:8px 12px; border-radius:6px; font-size:12px;"></div>
+      </div>
 
-                    var totalReceived = data.transactions.reduce(function(a,b){ return a + b.received; }, 0);
-                    var totalSent     = data.transactions.reduce(function(a,b){ return a + b.sent; },     0);
-                    var net = totalReceived - totalSent;
+      <div class="help-tip">
+        💡 채굴 보상(coinbase) 트랜잭션은 제외됩니다. 거래소 입출금, 일반 송금, 채굴풀 분배 등 실제 지갑 간 자금 이동을 모두 표시합니다.<br>
+        주소를 클릭하면 같은 페이지에서 해당 지갑 상세를 봅니다. <strong>TXID를 클릭하면 새 창에서 보낸 지갑의 전체 거래 이력</strong>을 확인할 수 있습니다.
+      </div>
 
-                    document.getElementById('detailReceived').textContent = formatNumber(totalReceived / 10000) + ' MBC';
-                    document.getElementById('detailSent').textContent     = formatNumber(totalSent     / 10000) + ' MBC';
-                    document.getElementById('detailNet').textContent = (net >= 0 ? '+' : '') + formatNumber(net / 10000) + ' MBC';
+      <div class="controls-bar">
+        <div class="control-info">
+          총 <strong id="txTotalCount">0</strong>건 · 페이지 <strong id="txCurrentPage">1</strong> / <strong id="txTotalPages">1</strong>
+        </div>
+      </div>
 
-                    var rows = data.transactions.slice(0, 100).map(function(tx) {
-                        var netAmt = tx.received - tx.sent;
-                        var netClass = netAmt >= 0 ? 'tx-in' : 'tx-out';
-                        var netStr = (netAmt >= 0 ? '+' : '') + formatNumber(netAmt / 10000);
-                        var fromAddr = tx.from || '알수없음';
-                        var toAddr   = tx.to   || '알수없음';
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>From</th>
+              <th>To</th>
+              <th class="right" style="width:140px;">Amount (MBC)</th>
+              <th class="center" style="width:90px;">Tx Hash</th>
+              <th class="center" style="width:100px;">Method</th>
+              <th class="center" style="width:90px;">Block</th>
+              <th class="center" style="width:90px;">Age</th>
+            </tr>
+          </thead>
+          <tbody id="transfersBody">
+            <tr><td colspan="7" style="text-align:center; padding:30px; color:#999;">불러오는 중…</td></tr>
+          </tbody>
+        </table>
+      </div>
 
-                        // From === To 자기 전송 처리
-                        var isSelf = (fromAddr === toAddr && fromAddr !== '알수없음' && fromAddr !== 'Coinbase(채굴)');
-                        var fromHtml, toHtml;
+      <div class="pagination" id="txPagination"></div>
+    </section>
 
-                        if (isSelf) {
-                            fromHtml = '<span class="address" onclick="drillDetail(\'' + escapeHtml(fromAddr) + '\')">' + escapeHtml(fromAddr) + '</span>';
-                            toHtml   = '<span class="self-transfer">(자기 전송)</span>';
-                        } else {
-                            if (fromAddr !== '알수없음' && fromAddr !== 'Coinbase(채굴)') {
-                                fromHtml = '<span class="address" onclick="drillDetail(\'' + escapeHtml(fromAddr) + '\')">' + escapeHtml(fromAddr) + '</span>';
-                            } else {
-                                fromHtml = '<span style="color:#888">' + escapeHtml(fromAddr) + '</span>';
-                            }
-                            if (toAddr !== '알수없음') {
-                                toHtml = '<span class="address" onclick="drillDetail(\'' + escapeHtml(toAddr) + '\')">' + escapeHtml(toAddr) + '</span>';
-                            } else {
-                                toHtml = '<span style="color:#888">' + escapeHtml(toAddr) + '</span>';
-                            }
-                        }
+    <!-- ─────────────── 페이지: Whale Alert (대형 거래 추적) ─────────────── -->
+    <section class="page-section" id="page-whales">
+      <div class="page-title">🐳 <span>Whale Alert</span></div>
+      <div class="page-subtitle">고래(Whale) 추적 · 대형 자금 이동을 실시간 모니터링</div>
 
-                        return '<tr>'
-                            + '<td>' + fromHtml + '</td>'
-                            + '<td>' + toHtml + '</td>'
-                            + '<td style="font-family:monospace;font-size:11px;">' + tx.txid.substring(0, 16) + '...</td>'
-                            + '<td class="tx-in">'  + (tx.received > 0 ? formatNumber(tx.received / 10000) : '-') + '</td>'
-                            + '<td class="tx-out">' + (tx.sent     > 0 ? formatNumber(tx.sent     / 10000) : '-') + '</td>'
-                            + '<td class="' + netClass + '">' + netStr + '</td>'
-                            + '<td>' + tx.confirmations + '</td>'
-                            + '<td style="font-size:11px;">' + formatDate(tx.time) + '</td>'
-                            + '</tr>';
-                    }).join('');
+      <div class="summary-grid">
+        <div class="s-card navy">
+          <div class="lbl">총 Whale 거래</div>
+          <div class="num" id="whaleTotal" style="font-size:18px;">-</div>
+          <div class="updated">DB 누적</div>
+        </div>
+        <div class="s-card blue">
+          <div class="lbl">최근 24시간</div>
+          <div class="num" id="whale24h" style="font-size:18px;">-</div>
+          <div class="updated">신규 거래</div>
+        </div>
+        <div class="s-card green">
+          <div class="lbl">현재 임계값</div>
+          <div class="num" id="whaleThreshold" style="font-size:16px;">1억 MBC</div>
+          <div class="updated">조정 가능</div>
+        </div>
+        <div class="s-card gold">
+          <div class="lbl">최신 블록</div>
+          <div class="num" id="whaleLatest" style="font-size:18px;">-</div>
+          <div class="updated">DB 기준</div>
+        </div>
+        <div class="s-card gray">
+          <div class="lbl">마지막 갱신</div>
+          <div class="num" id="whaleUpdated" style="font-size:16px;">-</div>
+          <div class="updated">자동 30초</div>
+        </div>
+      </div>
 
-                    document.getElementById('txTableBody').innerHTML = rows || '<tr><td colspan="8">거래 없음</td></tr>';
-                })
-                .catch(function() {
-                    if (document.getElementById('detailAddress').textContent === currentAddr) {
-                        document.getElementById('txTableBody').innerHTML = '<tr><td colspan="8" style="color:#f87171">데이터 로드 실패</td></tr>';
-                    }
-                });
+      <div class="search-card" style="padding:14px 16px; margin-bottom:14px;">
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <span style="font-size:13px; color:var(--mbc-navy); font-weight:700;">🐳 임계값 선택</span>
+          <select id="whaleThresholdSel" onchange="loadWhales(1)" style="padding:7px 12px; background:var(--bg-soft); border:1.5px solid var(--border); border-radius:5px; font-size:13px; font-weight:700; outline:none; cursor:pointer;">
+            <option value="100000000">1억 MBC 이상</option>
+            <option value="500000000">5억 MBC 이상</option>
+            <option value="1000000000">10억 MBC 이상</option>
+            <option value="10000000000">100억 MBC 이상</option>
+            <option value="100000000000">1,000억 MBC 이상</option>
+          </select>
+          <label style="display:inline-flex; align-items:center; gap:6px; font-size:13px; cursor:pointer;">
+            <input type="checkbox" id="whaleExcludePool" onchange="loadWhales(1)" style="cursor:pointer;">
+            <span>🏊 풀 분배 제외</span>
+          </label>
+        </div>
+      </div>
 
-            // 토큰 로드
-            fetch('/api/tokens/address/' + address)
-                .then(function(r) { return r.json(); })
-                .then(function(tokenData) {
-                    if (document.getElementById('detailAddress').textContent !== currentAddr) return;
-                    var balances = (tokenData.balances || []).filter(function(b) { return b.value > 0; });
-                    if (balances.length === 0) {
-                        document.getElementById('tokensContainer').innerHTML = '<div style="padding:20px;opacity:0.7">토큰 없음</div>';
-                    } else {
-                        document.getElementById('tokensContainer').innerHTML = balances.map(function(b) {
-                            return '<div style="background:#1a1f3a;padding:15px;border-radius:5px;cursor:pointer;margin-bottom:10px" onclick="showTokenTransfers(\'' + escapeHtml(currentAddr) + '\',\'' + escapeHtml(b.ticker) + '\')">'
-                                + '<div style="font-weight:bold;margin-bottom:5px">' + escapeHtml(b.ticker) + '</div>'
-                                + '<div style="color:#4ade80;font-size:16px">' + formatNumber(b.value / Math.pow(10, b.decimals || 0)) + '</div>'
-                                + '</div>';
-                        }).join('');
-                    }
-                })
-                .catch(function() {
-                    if (document.getElementById('detailAddress').textContent === currentAddr) {
-                        document.getElementById('tokensContainer').innerHTML = '<div style="padding:20px;color:#f87171">토큰 로드 실패</div>';
-                    }
-                });
-        }
+      <div class="help-tip">
+        💡 큰 자금이 움직이면 시장에 영향이 옵니다. 거래소로 들어가면 매도 압력, 거래소에서 나오면 HODL 신호로 해석되기도 합니다.<br>
+        주소 클릭으로 지갑 상세, TXID 클릭으로 보낸 지갑 거래 이력 확인 가능합니다.
+      </div>
 
-        // ── 토큰 전송 내역 ──────────────────────────────────────
-        function searchTokenTransfers(address, ticker) {
-            sessionStorage.setItem('lastPage', currentPage);
-            if (!document.getElementById('detailPage').classList.contains('show')) {
-                navHistory = [];
-                showDetailPage();
-            }
-            navHistory.push({ address: address, tab: 'tokens' });
-            document.getElementById('detailAddress').textContent = address;
-            document.getElementById('tokensContainer').innerHTML = '로딩 중...';
-            switchTabByName('tokens');
-            renderBreadcrumb();
-            _fetchTokenTransfers(address, ticker);
-        }
+      <div class="controls-bar">
+        <div class="control-info">총 <strong id="whaleCount">0</strong>건 · 페이지 <strong id="whalePage">1</strong> / <strong id="whaleTotalPages">1</strong></div>
+      </div>
 
-        function showTokenTransfers(address, ticker) {
-            switchTabByName('tokens');
-            document.getElementById('tokensContainer').innerHTML = '로딩 중...';
-            _fetchTokenTransfers(address, ticker);
-        }
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th class="center" style="width:90px;">시간</th>
+              <th class="center" style="width:80px;">블록</th>
+              <th>From</th>
+              <th>To</th>
+              <th class="right" style="width:170px;">금액 (MBC)</th>
+              <th class="center" style="width:80px;">TXID</th>
+            </tr>
+          </thead>
+          <tbody id="whaleBody">
+            <tr><td colspan="6" style="text-align:center; padding:30px; color:#999;">불러오는 중…</td></tr>
+          </tbody>
+        </table>
+      </div>
 
-        function _fetchTokenTransfers(address, ticker) {
-            fetch('/api/tokens/transfers/' + address + '/' + ticker)
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    var transfers = data.list || data.transfers || [];
-                    if (transfers.length === 0) {
-                        document.getElementById('tokensContainer').innerHTML = '<div style="padding:20px;opacity:0.7">' + escapeHtml(ticker) + ' 거래 없음</div>';
-                        return;
-                    }
-                    var rows = transfers.map(function(t) {
-                        var from = t.from || t.sender || '';
-                        var to   = t.to   || t.receiver || '';
-                        return '<tr>'
-                            + '<td>&#128260;</td>'
-                            + '<td><span class="address" onclick="drillDetail(\'' + escapeHtml(from) + '\')">' + escapeHtml(from.substring(0, 20)) + '...</span></td>'
-                            + '<td><span class="address" onclick="drillDetail(\'' + escapeHtml(to)   + '\')">' + escapeHtml(to.substring(0, 20))   + '...</span></td>'
-                            + '<td>' + formatNumber((t.amount || t.value) / Math.pow(10, t.decimals || 0)) + ' ' + escapeHtml(ticker) + '</td>'
-                            + '<td>' + formatDate(t.time || t.timestamp) + '</td>'
-                            + '</tr>';
-                    }).join('');
-                    document.getElementById('tokensContainer').innerHTML =
-                        '<table style="margin-top:20px;width:100%;border-collapse:collapse"><thead><tr><th></th><th>From</th><th>To</th><th>금액</th><th>시간</th></tr></thead><tbody>'
-                        + rows + '</tbody></table>';
-                })
-                .catch(function() {
-                    document.getElementById('tokensContainer').innerHTML = '<div style="padding:20px;color:#f87171">토큰 거래 로드 실패</div>';
-                });
-        }
+      <div class="pagination" id="whalePagination"></div>
+    </section>
 
-        // ── 탭 전환 ─────────────────────────────────────────────
-        function switchTab(tabName, btn) {
-            document.querySelectorAll('.tab').forEach(function(b) { b.classList.remove('active'); });
-            document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
-            btn.classList.add('active');
-            document.getElementById(tabName + 'Tab').classList.add('active');
-            if (navHistory.length > 0) navHistory[navHistory.length - 1].tab = tabName;
-        }
+    <!-- ─────────────── 페이지 2: 주소 검색 ─────────────── -->
+    <section class="page-section" id="page-search">
+      <div class="page-title">🔍 <span data-i18n="page_search_title">지갑 주소 검색</span></div>
+      <div class="page-subtitle" data-i18n="page_search_sub">MBC 지갑 주소를 입력하면 거래 내역과 잔액을 확인할 수 있습니다</div>
 
-        function switchTabByName(tabName) {
-            document.querySelectorAll('.tab').forEach(function(b) { b.classList.remove('active'); });
-            document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
-            var id = 'tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
-            var btn = document.getElementById(id);
-            if (btn) btn.classList.add('active');
-            var content = document.getElementById(tabName + 'Tab');
-            if (content) content.classList.add('active');
-        }
+      <div class="search-card">
+        <h3 data-i18n="search_card_title">지갑 주소 입력</h3>
+        <div class="search-box">
+          <input type="text" id="searchInput" data-i18n-placeholder="search_placeholder" placeholder="B로 시작하는 MBC 지갑 주소... (예: Bq7Ld3wj...)" autocomplete="off">
+          <button onclick="searchAddress()" data-i18n="search_btn">검색</button>
+        </div>
+      </div>
 
-        // ── 뒤로가기 ────────────────────────────────────────────
-        function goBack() {
-            navHistory.pop(); // 현재 제거
-            if (navHistory.length > 0) {
-                var prev = navHistory[navHistory.length - 1];
-                _loadDetail(prev.address, prev.tab || 'mbc');
-                window.scrollTo(0, 0);
-            } else {
-                showListPage();
-            }
-        }
+      <div class="help-tip" data-i18n="search_tip">
+        💡 지갑 주소 형식: <strong>B</strong> 또는 <strong>b</strong> 또는 <strong>mbc1q</strong> 로 시작하는 문자열<br>
+        주소를 정확히 입력해야 검색됩니다 (대소문자 구분).
+      </div>
+    </section>
 
-        // ── 메인 목록 ────────────────────────────────────────────
-        function loadData() {
-            fetch('/api/holders').then(function(r) { return r.json(); }).then(function(data) {
-                allHolders = data.holders || [];
-                document.getElementById('holderCount').textContent = (data.count || 0).toLocaleString();
-                document.getElementById('blockHeight').textContent = (data.blockHeight || '-').toLocaleString();
-                document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('ko-KR');
-                // 상세 페이지 보는 중이면 목록 렌더링 건너뜀
-                if (!document.getElementById('listPage').classList.contains('hide')) {
-                    renderPage();
-                    renderPagination();
-                }
-            });
-        }
+    <!-- ─────────────── 페이지 3: 전체 통계 ─────────────── -->
+    <section class="page-section" id="page-stats">
+      <div class="page-title">📊 <span data-i18n="page_stats_title">전체 통계</span></div>
+      <div class="page-subtitle" data-i18n="page_stats_sub">MicroBitcoin 네트워크 현황 한눈에 보기</div>
 
-        // ── 토큰 배치 로딩 ──────────────────────────────────────
-        function startTokenBatchLoad(items) {
-            if (tokenLoadTimer) clearTimeout(tokenLoadTimer);
-            tokenLoadQueue = items.slice();
-            tokenLoadTimer = setTimeout(processTokenBatch, 200);
-        }
+      <!-- 반감기 카운트다운 -->
+      <div style="background:linear-gradient(135deg, var(--mbc-navy), var(--mbc-navy-light)); color:#fff; border-radius:14px; padding:24px 28px; margin-bottom:22px; box-shadow:0 4px 16px rgba(22,0,92,.2);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+          <div>
+            <div style="font-size:13px; color:#C7C9D9; letter-spacing:1px; margin-bottom:4px;">⏱ 다음 보상 감소까지</div>
+            <div style="font-size:11px; color:#9AA1B0;">MBC는 약 2년마다 블록 보상이 30% 감소합니다</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px; color:#9AA1B0;">현재 Epoch</div>
+            <div style="font-size:22px; font-weight:800; color:var(--mbc-gold);" id="currentEpoch">-</div>
+          </div>
+        </div>
 
-        function processTokenBatch() {
-            var batch = tokenLoadQueue.splice(0, 5);
-            if (batch.length === 0) return;
-            Promise.all(batch.map(function(item) {
-                return fetch('/api/tokens/address/' + item.address)
-                    .then(function(r) { return r.json(); })
-                    .then(function(data) {
-                        var balances = (data.balances || []).filter(function(b) { return b.value > 0; });
-                        var cell = document.getElementById('tcell-' + item.rowIndex);
-                        if (!cell) return;
-                        if (balances.length > 0) {
-                            cell.innerHTML = balances.map(function(b) {
-                                return '<span class="token-badge" onclick="searchTokenTransfers(\'' + escapeHtml(item.address) + '\',\'' + escapeHtml(b.ticker) + '\')">' + escapeHtml(b.ticker) + '</span>';
-                            }).join(' ');
-                        } else {
-                            cell.innerHTML = '<span style="color:#555;font-size:11px">-</span>';
-                        }
-                    })
-                    .catch(function() {
-                        var cell = document.getElementById('tcell-' + item.rowIndex);
-                        if (cell) cell.innerHTML = '<span style="color:#555;font-size:11px">-</span>';
-                    });
-            })).then(function() {
-                if (tokenLoadQueue.length > 0) setTimeout(processTokenBatch, 300);
-            });
-        }
+        <div id="halvingCountdown" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin:20px 0;">
+          <div style="background:rgba(255,255,255,.1); border-radius:10px; padding:16px 8px; text-align:center;">
+            <div style="font-size:36px; font-weight:900; font-family:'Consolas',monospace;" id="cd-days">000</div>
+            <div style="font-size:11px; color:#C7C9D9; margin-top:4px;">일</div>
+          </div>
+          <div style="background:rgba(255,255,255,.1); border-radius:10px; padding:16px 8px; text-align:center;">
+            <div style="font-size:36px; font-weight:900; font-family:'Consolas',monospace;" id="cd-hours">00</div>
+            <div style="font-size:11px; color:#C7C9D9; margin-top:4px;">시간</div>
+          </div>
+          <div style="background:rgba(255,255,255,.1); border-radius:10px; padding:16px 8px; text-align:center;">
+            <div style="font-size:36px; font-weight:900; font-family:'Consolas',monospace;" id="cd-mins">00</div>
+            <div style="font-size:11px; color:#C7C9D9; margin-top:4px;">분</div>
+          </div>
+          <div style="background:rgba(255,255,255,.1); border-radius:10px; padding:16px 8px; text-align:center;">
+            <div style="font-size:36px; font-weight:900; font-family:'Consolas',monospace; color:var(--mbc-gold);" id="cd-secs">00</div>
+            <div style="font-size:11px; color:#C7C9D9; margin-top:4px;">초</div>
+          </div>
+        </div>
 
-        function renderPage() {
-            var start = (currentPage - 1) * itemsPerPage;
-            var pageData = allHolders.slice(start, start + itemsPerPage);
-            var totalBalance = allHolders.reduce(function(a,b){ return a + b.balance; }, 0);
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; padding-top:14px; border-top:1px solid rgba(255,255,255,.15);">
+          <div>
+            <div style="font-size:11px; color:#9AA1B0; margin-bottom:2px;">현재 블록 보상</div>
+            <div style="font-size:18px; font-weight:700;"><span id="currentReward">-</span> <span style="font-size:11px; color:#C7C9D9;">MBC</span></div>
+          </div>
+          <div>
+            <div style="font-size:11px; color:#9AA1B0; margin-bottom:2px;">다음 epoch 보상</div>
+            <div style="font-size:18px; font-weight:700; color:#FF9E80;"><span id="nextReward">-</span> <span style="font-size:11px; color:#C7C9D9;">MBC (-30%)</span></div>
+          </div>
+          <div>
+            <div style="font-size:11px; color:#9AA1B0; margin-bottom:2px;">다음 epoch 시작일</div>
+            <div style="font-size:15px; font-weight:700;" id="nextEpochDate">-</div>
+          </div>
+        </div>
 
-            var html = pageData.map(function(h, i) {
-                var rowIndex = start + i;
-                return '<tr>'
-                    + '<td>' + (rowIndex + 1) + '</td>'
-                    + '<td><span class="address" onclick="showDetail(\'' + escapeHtml(h.address) + '\')">' + escapeHtml(h.address) + '</span></td>'
-                    + '<td>' + formatNumber(h.balance / 100000000) + '</td>'
-                    + '<td>' + ((h.balance / totalBalance) * 100).toFixed(4) + '%</td>'
-                    + '<td id="tcell-' + rowIndex + '"><span style="color:#555;font-size:11px">...</span></td>'
-                    + '</tr>';
-            }).join('');
+        <div style="margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,.15); font-size:12px; color:#C7C9D9;">
+          📚 반감기 자세한 분석은 <a href="https://canary77.tistory.com" target="_blank" style="color:var(--mbc-gold); text-decoration:underline; font-weight:700;">블로그</a>에서 확인하세요
+        </div>
+      </div>
 
-            document.getElementById('tableBody').innerHTML = html;
 
-            // 토큰 배치 로딩 예약
-            var queueItems = pageData.map(function(h, i) {
-                return { rowIndex: start + i, address: h.address };
-            });
-            startTokenBatchLoad(queueItems);
-        }
+      <div class="summary-grid">
+        <div class="s-card navy">
+          <div class="lbl" data-i18n="supply_max">최대 발행량</div>
+          <div class="num" style="font-size:18px;">815억 MBC</div>
+          <div class="updated" data-i18n="supply_max_sub">백서 명시</div>
+        </div>
+        <div class="s-card blue">
+          <div class="lbl" data-i18n="supply_snap">스냅샷 활성</div>
+          <div class="num" style="font-size:18px;">443.86억</div>
+          <div class="updated" data-i18n="supply_snap_sub">초기 분배분</div>
+        </div>
+        <div class="s-card gold" onclick="showDetail('mbc1qsr02lgky5tghhxupl4u48l96h7fdk07muekwru')" style="cursor:pointer;" title="사토시 예치 지갑 거래 내역 보기">
+          <div class="lbl" data-i18n="supply_satoshi">사토시 예치</div>
+          <div class="num" style="font-size:18px;">110억</div>
+          <div class="updated" data-i18n="supply_satoshi_sub">타임락 · 클릭하여 거래 내역 →</div>
+        </div>
+        <div class="s-card green">
+          <div class="lbl" data-i18n="supply_mining">향후 채굴</div>
+          <div class="num" style="font-size:18px;">261.14억</div>
+          <div class="updated" data-i18n="supply_mining_sub">~100년</div>
+        </div>
+      </div>
 
-        function renderPagination() {
-            var maxPages = Math.ceil(allHolders.length / itemsPerPage);
-            var p = document.getElementById('pagination');
-            p.innerHTML = '';
-            if (currentPage > 1) {
-                var b = document.createElement('button');
-                b.textContent = '⏮ 처음';
-                b.onclick = function() { currentPage = 1; renderPage(); renderPagination(); window.scrollTo(0,0); };
-                p.appendChild(b);
-            }
-            var s = Math.max(1, currentPage - 5);
-            var e = Math.min(maxPages, s + 9);
-            for (var i = s; i <= e; i++) {
-                (function(n) {
-                    var btn = document.createElement('button');
-                    btn.textContent = n;
-                    if (n === currentPage) btn.classList.add('active');
-                    btn.onclick = function() { currentPage = n; renderPage(); renderPagination(); window.scrollTo(0,0); };
-                    p.appendChild(btn);
-                })(i);
-            }
-            if (currentPage < maxPages) {
-                var b2 = document.createElement('button');
-                b2.textContent = '마지막 ⏭';
-                b2.onclick = function() { currentPage = maxPages; renderPage(); renderPagination(); window.scrollTo(0,0); };
-                p.appendChild(b2);
-            }
-            var sp = document.createElement('span');
-            sp.style.cssText = 'padding:8px 12px;color:#888;font-size:12px;';
-            sp.textContent = currentPage + ' / ' + maxPages;
-            p.appendChild(sp);
-        }
+      <div class="static-card">
+        <h2 data-i18n="stats_network">네트워크 사양</h2>
+        <div class="info-row"><div class="label" data-i18n="stats_fork">분기 시점</div><div class="value">2018-07-11 (BTC 525,000)</div></div>
+        <div class="info-row"><div class="label" data-i18n="stats_relaunch">재론칭</div><div class="value">2019-10-09 (Power2B)</div></div>
+        <div class="info-row"><div class="label" data-i18n="stats_blocktime">블록 시간</div><div class="value" data-i18n="stats_blocktime_val">분당 1블록 (~60초)</div></div>
+        <div class="info-row"><div class="label" data-i18n="stats_algo">알고리즘</div><div class="value">Power2B (YesPower)</div></div>
+        <div class="info-row"><div class="label" data-i18n="stats_blocksize">블록 크기</div><div class="value">300 KB</div></div>
+        <div class="info-row"><div class="label" data-i18n="stats_diff">난이도 조정</div><div class="value">Zawy12 LWMA3</div></div>
+        <div class="info-row"><div class="label" data-i18n="stats_airdrop">에어드롭 비율</div><div class="value">1 BTC = 10,000 MBC</div></div>
+      </div>
 
-        function searchAddress() {
-            var input = document.getElementById('searchInput').value.trim();
-            if (input) showDetail(input);
-        }
+      <!-- 블로그 교차 링크 배너 -->
+      <a href="https://canary77.tistory.com" target="_blank" style="display:block; background:linear-gradient(135deg, #FFF8E1, #FFE082); border:1.5px solid #F5A623; border-radius:12px; padding:22px 26px; margin-top:18px; text-decoration:none; transition:transform .2s, box-shadow .2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 16px rgba(245,166,35,.25)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+          <div style="font-size:38px;">📚</div>
+          <div style="flex:1; min-width:200px;">
+            <div style="font-size:17px; font-weight:800; color:var(--mbc-navy); margin-bottom:4px;">더 깊은 분석은 블로그에서 확인하세요</div>
+            <div style="font-size:13px; color:#6D4C00;">MBC 백서 정독·반감기 메커니즘·채굴 알고리즘 분석 등 상세 글들이 기다리고 있어요</div>
+          </div>
+          <div style="background:var(--mbc-navy); color:#fff; padding:10px 20px; border-radius:8px; font-weight:700; font-size:14px; white-space:nowrap;">블로그 방문하기 →</div>
+        </div>
+      </a>
+    </section>
 
-        function downloadCSV() {
-            var totalBalance = allHolders.reduce(function(a,b){ return a + b.balance; }, 0);
-            var csv = '순위,주소,잔액(MBC),점유율(%)\n';
-            allHolders.forEach(function(h, i) {
-                csv += (i+1) + ',"' + h.address + '",' + formatNumber(h.balance/100000000) + ',' + ((h.balance/totalBalance)*100).toFixed(4) + '\n';
-            });
-            var blob = new Blob(['﻿' + csv], {type: 'text/csv;charset=utf-8;'});
-            var link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'MicroBitcoin_Holders.csv';
-            link.click();
-        }
+    <!-- ─────────────── 페이지 4: 채굴 방법 소개 ─────────────── -->
+    <section class="page-section" id="page-mining">
+      <div class="page-title">⛏️ <span data-i18n="page_mining_title">채굴 방법 소개</span></div>
+      <div class="page-subtitle" data-i18n="page_mining_sub">MBC를 직접 채굴해보고 싶은 분들을 위한 입문 가이드</div>
 
-        document.getElementById('searchInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') searchAddress(); });
-        loadData();
-        setInterval(loadData, 300000);
-    </script>
+      <div class="static-card">
+        <h2 data-i18n="mining_intro_title">MBC 채굴이 특별한 이유</h2>
+        <p data-i18n="mining_intro_p1"><strong>MicroBitcoin은 Power2B 알고리즘</strong>을 사용해 ASIC 채굴기 없이 일반 CPU로 채굴할 수 있습니다. 사토시 나카모토가 비트코인 백서에서 강조한 <strong>"1-CPU-1-Vote"</strong> 원칙을 실제로 구현한 몇 안 되는 코인입니다.</p>
+        <p data-i18n="mining_intro_p2">데스크톱 PC는 물론 안드로이드 스마트폰에서도 채굴이 가능하며, 누구나 네트워크에 참여할 수 있습니다.</p>
+
+        <div class="warn-box" data-i18n="mining_warn">
+          ⚠️ 본 가이드는 정보 제공 목적이며 채굴로 인한 전기 요금, 하드웨어 발열·손상, 배터리 소모 등의 책임은 본인에게 있습니다. 수익성은 시세와 네트워크 난이도에 따라 변동하며 손실 가능성이 있습니다.
+        </div>
+
+        <h2 data-i18n="mining_pc_title">💻 PC에서 채굴하기</h2>
+
+        <div class="step-card">
+          <strong data-i18n="mining_pc_step1_title">1단계: MBC 지갑 주소 준비</strong>
+          <p data-i18n="mining_pc_step1_desc">채굴 보상을 받을 본인 지갑 주소가 필요합니다. <a href="https://microbitcoinorg.github.io/wallet/" target="_blank">공식 웹지갑</a> 또는 Wonpay 모바일 지갑에서 주소를 생성하세요. (B로 시작하는 문자열)</p>
+        </div>
+
+        <div class="step-card">
+          <strong data-i18n="mining_pc_step2_title">2단계: cpuminer-opt 다운로드</strong>
+          <p data-i18n="mining_pc_step2_desc"><a href="https://github.com/JayDDee/cpuminer-opt/releases" target="_blank">cpuminer-opt GitHub Releases</a>에서 본인 OS(Windows/Linux/Mac)에 맞는 최신 버전을 다운로드합니다.</p>
+        </div>
+
+        <div class="step-card">
+          <strong data-i18n="mining_pc_step3_title">3단계: 채굴 풀 선택</strong>
+          <p data-i18n="mining_pc_step3_desc">소규모 채굴자는 <strong>zpool.ca</strong>를 추천합니다. 다른 사람들과 해시를 합쳐 안정적으로 보상을 받을 수 있습니다.</p>
+          <ul>
+            <li>풀 주소: <code>stratum+tcp://power2b.mine.zpool.ca:6242</code></li>
+            <li>알고리즘: <code>power2b</code></li>
+            <li>지급 코인: <code>c=MBC,zap=MBC</code></li>
+          </ul>
+        </div>
+
+        <div class="step-card">
+          <strong data-i18n="mining_pc_step4_title">4단계: 채굴 명령어 실행</strong>
+          <p data-i18n="mining_pc_step4_desc">cpuminer 폴더에서 다음과 같이 실행:</p>
+          <p><code>cpuminer.exe -a power2b -o stratum+tcp://power2b.mine.zpool.ca:6242 -u 본인_MBC_지갑주소 -p c=MBC,zap=MBC -t 4 --no-color</code></p>
+          <p data-i18n="mining_pc_step4_note"><code>-t 4</code>는 사용할 CPU 스레드 수입니다. 본인 PC 코어 수에 맞게 조정하세요.</p>
+        </div>
+
+        <div class="step-card">
+          <strong data-i18n="mining_pc_step5_title">5단계: 보상 확인</strong>
+          <p data-i18n="mining_pc_step5_desc">zpool.ca 사이트에서 본인 지갑 주소로 검색하면 채굴 통계와 잔액을 볼 수 있습니다. 최소 지급액 도달 시 자동으로 본인 지갑으로 전송됩니다.</p>
+        </div>
+
+        <h2 data-i18n="mining_mobile_title">📱 안드로이드 폰에서 채굴하기</h2>
+        <p data-i18n="mining_mobile_p1">MBC는 ARM CPU 친화 알고리즘이라 스마트폰에서도 채굴이 가능합니다. 다만 발열·배터리 소모가 크니 충전 중에만 권장합니다.</p>
+
+        <div class="step-card">
+          <strong data-i18n="mining_mobile_step1_title">권장 앱: MBC Miner (직접 배포)</strong>
+          <p data-i18n="mining_mobile_step1_desc">Play Store는 채굴 앱을 금지하므로 GitHub에서 직접 APK를 받아야 합니다.</p>
+          <p><a onclick="navigate('contact'); return false;" style="cursor:pointer;" data-i18n="mining_apk_link">📥 APK 다운로드 링크 안내 보기</a></p>
+        </div>
+
+        <div class="warn-box" data-i18n="mining_mobile_warn">
+          ⚠️ 안드로이드 출처를 알 수 없는 앱 설치 허용이 필요합니다. APK 파일은 본인의 책임 하에 설치하세요. Google Play Store 외부에서 받는 앱은 항상 신중히 검토해야 합니다.
+        </div>
+
+        <h2 data-i18n="mining_profit_title">💰 수익성에 대한 현실적인 안내</h2>
+        <p data-i18n="mining_profit_p1">솔직히 말씀드리면 <strong>MBC 채굴의 수익성은 낮습니다</strong>:</p>
+        <ul>
+          <li data-i18n="mining_profit_li1">갤럭시 S24 기준 약 30~40 H/s</li>
+          <li data-i18n="mining_profit_li2">일반 데스크톱 PC 기준 약 600~1,000 H/s</li>
+          <li data-i18n="mining_profit_li3">하루 24시간 채굴해도 시세 기준 매우 적은 보상</li>
+          <li data-i18n="mining_profit_li4">전기 요금이 수익보다 클 가능성이 큼</li>
+        </ul>
+        <p data-i18n="mining_profit_p2">그럼에도 채굴을 추천하는 이유는 <strong>네트워크 참여 경험과 학습 가치</strong> 때문입니다. 비트코인이 ASIC에 점령된 지금, 일반인이 직접 PoW 블록체인에 참여할 수 있는 거의 유일한 기회입니다.</p>
+
+        <h2 data-i18n="mining_more_title">📚 더 자세한 가이드</h2>
+        <p data-i18n="mining_more_p1">단계별 상세 가이드와 트러블슈팅은 운영자 블로그에서 확인할 수 있습니다.</p>
+        <p><a href="https://canary77.tistory.com" target="_blank">📝 canary77.tistory.com - MBC 채굴 가이드 시리즈</a></p>
+      </div>
+
+      <!-- 💰 수익성 계산기 -->
+      <div class="static-card">
+        <h2>💰 채굴 수익 계산기</h2>
+        <p style="color:var(--text-sub); font-size:13px; margin-bottom:18px;">본인 장비의 해시레이트를 입력하면 현재 네트워크 난이도와 시세 기준으로 예상 수익을 계산해드립니다.</p>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:18px;">
+          <div>
+            <label style="display:block; font-size:12px; color:var(--text-sub); font-weight:600; margin-bottom:6px;">내 해시레이트 (H/s)</label>
+            <input type="number" id="calcHashrate" value="35" min="1" oninput="calculateProfit()" style="width:100%; padding:10px 14px; background:var(--bg-soft); border:1.5px solid var(--border); border-radius:8px; font-size:15px; font-family:'Consolas',monospace; outline:none; font-weight:700;">
+            <div style="font-size:11px; color:var(--text-sub); margin-top:4px;">예: 갤럭시 S24 ~35, 일반 PC ~700</div>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:var(--text-sub); font-weight:600; margin-bottom:6px;">전기료 (원/kWh, 선택)</label>
+            <input type="number" id="calcElec" value="160" min="0" oninput="calculateProfit()" style="width:100%; padding:10px 14px; background:var(--bg-soft); border:1.5px solid var(--border); border-radius:8px; font-size:15px; font-family:'Consolas',monospace; outline:none; font-weight:700;">
+            <div style="font-size:11px; color:var(--text-sub); margin-top:4px;">한국 평균 ~160원, 누진 시 ~250원</div>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:var(--text-sub); font-weight:600; margin-bottom:6px;">PC 소비전력 (W)</label>
+            <input type="number" id="calcPower" value="100" min="0" oninput="calculateProfit()" style="width:100%; padding:10px 14px; background:var(--bg-soft); border:1.5px solid var(--border); border-radius:8px; font-size:15px; font-family:'Consolas',monospace; outline:none; font-weight:700;">
+            <div style="font-size:11px; color:var(--text-sub); margin-top:4px;">노트북 ~50W, 데스크톱 ~150W</div>
+          </div>
+        </div>
+
+        <div id="calcInfo" style="font-size:11px; color:var(--text-sub); margin-bottom:14px; padding:8px 12px; background:var(--bg-soft); border-radius:6px;">
+          네트워크 정보: 불러오는 중...
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+          <div style="background:#E8F5E9; padding:16px 18px; border-radius:10px; border-left:4px solid #2E7D32;">
+            <div style="font-size:11px; color:#2E7D32; font-weight:600; margin-bottom:6px;">일일 채굴량</div>
+            <div style="font-size:18px; font-weight:800; color:#2E7D32; word-break:break-all;" id="calcDayMbc">- MBC</div>
+            <div style="font-size:13px; color:#2E7D32; margin-top:4px;" id="calcDayKrw">- 원</div>
+          </div>
+          <div style="background:#E3F2FD; padding:16px 18px; border-radius:10px; border-left:4px solid var(--mbc-blue);">
+            <div style="font-size:11px; color:var(--mbc-blue); font-weight:600; margin-bottom:6px;">월간 예상</div>
+            <div style="font-size:18px; font-weight:800; color:var(--mbc-blue); word-break:break-all;" id="calcMonthMbc">- MBC</div>
+            <div style="font-size:13px; color:var(--mbc-blue); margin-top:4px;" id="calcMonthKrw">- 원</div>
+          </div>
+          <div style="background:#FFF8E1; padding:16px 18px; border-radius:10px; border-left:4px solid var(--mbc-gold);">
+            <div style="font-size:11px; color:#6D4C00; font-weight:600; margin-bottom:6px;">월 전기료</div>
+            <div style="font-size:18px; font-weight:800; color:#6D4C00;" id="calcElecCost">- 원</div>
+            <div style="font-size:11px; color:#6D4C00; margin-top:4px;">24시간 가동 기준</div>
+          </div>
+          <div id="calcNetCard" style="background:#FFEBEE; padding:16px 18px; border-radius:10px; border-left:4px solid #C62828;">
+            <div style="font-size:11px; color:#C62828; font-weight:600; margin-bottom:6px;">월 순수익</div>
+            <div style="font-size:18px; font-weight:800; color:#C62828;" id="calcNetProfit">- 원</div>
+            <div style="font-size:11px; margin-top:4px;" id="calcNetMsg">계산 중...</div>
+          </div>
+        </div>
+
+        <div class="warn-box" style="margin-top:18px;">
+          ⚠️ 위 계산은 <strong>현재 시점 기준 추정치</strong>입니다. 실제 수익은 시세·네트워크 난이도·풀 수수료·해시레이트 변동에 따라 달라질 수 있습니다. MBC 채굴은 대부분의 환경에서 <strong>전기료가 수익보다 클 가능성이 높습니다</strong>. 학습/실험 목적으로 활용하세요.
+        </div>
+      </div>
+
+      <!-- 블로그 교차 링크 배너 -->
+      <a href="https://canary77.tistory.com" target="_blank" style="display:block; background:linear-gradient(135deg, #FFF8E1, #FFE082); border:1.5px solid #F5A623; border-radius:12px; padding:22px 26px; margin-top:18px; text-decoration:none; transition:transform .2s, box-shadow .2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 16px rgba(245,166,35,.25)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+          <div style="font-size:38px;">⛏️</div>
+          <div style="flex:1; min-width:200px;">
+            <div style="font-size:17px; font-weight:800; color:var(--mbc-navy); margin-bottom:4px;">최적의 채굴 효율을 위한 장비 세팅 팁</div>
+            <div style="font-size:13px; color:#6D4C00;">cpuminer-opt 컴파일, CPU 코어 최적화, 발열 관리 등 실전 채굴 노하우</div>
+          </div>
+          <div style="background:var(--mbc-navy); color:#fff; padding:10px 20px; border-radius:8px; font-weight:700; font-size:14px; white-space:nowrap;">블로그 보기 →</div>
+        </div>
+      </a>
+    </section>
+
+    <!-- ─────────────── 페이지: 최근 소식 (NEWS) ─────────────── -->
+    <section class="page-section" id="page-news">
+      <div class="page-title">📰 <span>최근 소식</span></div>
+      <div class="page-subtitle">MicroBitcoin 관련 공지·업데이트·이벤트 소식</div>
+
+      <div class="help-tip">
+        💡 운영자가 직접 등록한 공식 소식만 표시됩니다. 글쓰기는 어드민 페이지에서만 가능합니다.
+      </div>
+
+      <div id="newsList" style="display:flex; flex-direction:column; gap:14px;">
+        <div style="text-align:center; padding:30px; color:#999;">불러오는 중…</div>
+      </div>
+    </section>
+
+    <!-- ─────────────── 페이지: Q&A ─────────────── -->
+    <section class="page-section" id="page-qna">
+      <div class="page-title">❓ <span>Q&amp;A 게시판</span></div>
+      <div class="page-subtitle">누구나 익명으로 질문하고 운영자가 답변합니다 · 비밀번호 4자리로 본인 글 관리</div>
+
+      <div class="help-tip">
+        💡 비밀번호는 본인이 작성한 글을 수정·삭제할 때 필요합니다. <strong>잊지 마세요!</strong> (서버에는 hash로만 저장되어 복구 불가능)
+      </div>
+
+      <div class="controls-bar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+        <div class="control-info">총 <strong id="qnaTotal">0</strong>건 · 페이지 <strong id="qnaPage">1</strong> / <strong id="qnaTotalPages">1</strong></div>
+        <button onclick="openQnaWriteModal()" style="padding:9px 18px; background:var(--mbc-navy); color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:700; font-size:13px;">✍ 글쓰기</button>
+      </div>
+
+      <div class="table-card">
+        <table style="width:100%;">
+          <thead>
+            <tr>
+              <th class="center" style="width:60px;">번호</th>
+              <th class="center" style="width:90px;">상태</th>
+              <th>제목</th>
+              <th class="center" style="width:110px;">작성자</th>
+              <th class="center" style="width:100px;">작성일</th>
+              <th class="center" style="width:60px;">조회</th>
+            </tr>
+          </thead>
+          <tbody id="qnaListBody">
+            <tr><td colspan="6" style="text-align:center; padding:30px; color:#999;">불러오는 중…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination" id="qnaPagination"></div>
+    </section>
+
+    <!-- ─────────────── 페이지: Q&A 상세 ─────────────── -->
+    <section class="page-section" id="page-qna-detail">
+      <a onclick="navigate('qna'); return false;" style="display:inline-flex; align-items:center; gap:6px; color:var(--mbc-navy); cursor:pointer; font-size:13px; font-weight:600; margin-bottom:14px; text-decoration:none;">← 목록으로</a>
+
+      <div class="static-card" id="qnaDetailCard">
+        <div style="text-align:center; padding:30px; color:#999;">불러오는 중…</div>
+      </div>
+    </section>
+
+    <!-- ─────────────── 페이지: 관련 사이트 ─────────────── -->
+    <section class="page-section" id="page-links">
+      <div class="page-title">🔗 <span>관련 사이트</span></div>
+      <div class="page-subtitle">MicroBitcoin 관련 공식·커뮤니티 사이트 모음</div>
+
+      <div id="linksList" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:14px;">
+        <div style="text-align:center; padding:30px; color:#999; grid-column:1/-1;">불러오는 중…</div>
+      </div>
+    </section>
+
+    <!-- ─────────────── 페이지: MBC 레이어2 토큰 일람 ─────────────── -->
+    <section class="page-section" id="page-tokens">
+      <div class="page-title">🪙 <span>MBC 레이어2 토큰 일람</span></div>
+      <div class="page-subtitle">MicroBitcoin Layer2 토큰 목록 · 운영자가 직접 등록한 공식 토큰만 표시</div>
+
+      <div class="help-tip">
+        💡 토큰 카드를 클릭하면 해당 토큰의 홀더 리스트(상위 보유자)를 볼 수 있습니다. 새 토큰 추가는 관리자 페이지에서 진행합니다.
+      </div>
+
+      <div id="tokensList" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+        <div style="text-align:center; padding:40px 20px; color:#999; grid-column:1/-1;">불러오는 중…</div>
+      </div>
+    </section>
+
+    <!-- ─────────────── 페이지: 토큰 홀더 (티커별) ─────────────── -->
+    <section class="page-section" id="page-token-detail">
+      <a onclick="navigate('tokens'); return false;" style="display:inline-flex; align-items:center; gap:6px; color:var(--mbc-navy); cursor:pointer; font-size:13px; font-weight:600; margin-bottom:14px; text-decoration:none;">← 토큰 목록으로</a>
+
+      <div class="static-card" style="margin-bottom:18px;">
+        <div id="tokenDetailHeader">
+          <div style="font-size:12px; color:var(--text-sub); margin-bottom:6px; font-weight:600;">토큰</div>
+          <div id="tokenDetailName" style="font-size:22px; font-weight:800; color:var(--mbc-navy); margin-bottom:6px;">-</div>
+          <div id="tokenDetailDesc" style="font-size:13px; color:var(--text-sub); line-height:1.6;">-</div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-top:18px;">
+          <div style="background:var(--bg-soft); padding:14px 16px; border-radius:8px;">
+            <div style="font-size:11px; color:var(--text-sub); margin-bottom:4px;">티커</div>
+            <div id="tokenDetailTicker" style="font-size:18px; font-weight:800; color:var(--mbc-navy);">-</div>
+          </div>
+          <div style="background:var(--bg-soft); padding:14px 16px; border-radius:8px;">
+            <div style="font-size:11px; color:var(--text-sub); margin-bottom:4px;">홀더 수</div>
+            <div id="tokenDetailHolderCount" style="font-size:18px; font-weight:800; color:var(--mbc-blue);">-</div>
+          </div>
+          <div style="background:var(--bg-soft); padding:14px 16px; border-radius:8px;">
+            <div style="font-size:11px; color:var(--text-sub); margin-bottom:4px;">최대 발행량</div>
+            <div id="tokenDetailSupply" style="font-size:18px; font-weight:800; color:var(--mbc-gold);">-</div>
+          </div>
+        </div>
+        <div id="tokenDetailLink" style="margin-top:14px;"></div>
+      </div>
+
+      <div class="controls-bar">
+        <div class="control-info">총 <strong id="tokenHolderTotal">0</strong>명 보유</div>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th class="center" style="width:60px;">#</th>
+              <th>지갑 주소</th>
+              <th class="right" style="width:180px;">보유량</th>
+            </tr>
+          </thead>
+          <tbody id="tokenHolderBody">
+            <tr><td colspan="3" style="text-align:center; padding:30px; color:#999;">불러오는 중…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ─────────────── 페이지: 원페이 지갑 ─────────────── -->
+    <section class="page-section" id="page-wonpay">
+      <div class="page-title">👛 <span data-i18n="page_wonpay_title">Wonpay 지갑</span></div>
+      <div class="page-subtitle" data-i18n="page_wonpay_sub">MicroBitcoin 공식 모바일 지갑 · Android / iOS 지원</div>
+
+      <div class="static-card">
+        <h2>📱 Wonpay 모바일 지갑이란?</h2>
+        <p><strong>Wonpay</strong>는 MicroBitcoin(MBC)을 모바일에서 손쉽게 보관·송수신할 수 있는 공식 지갑 앱입니다. Android와 iOS 모두 지원하며, 지갑 생성·복구·QR 송수신·잔액 확인 등 기본 기능을 모두 제공합니다.</p>
+
+        <div class="warn-box" style="margin-top:14px;">
+          ⚠️ 웹사이트(wonpay.io)는 현재 접속이 불가하지만, <strong>앱은 정상 운영 중</strong>입니다. 아래 공식 스토어 링크에서 안전하게 다운로드하세요.
+        </div>
+
+        <h2 style="margin-top:24px;">📥 다운로드</h2>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-top:14px;">
+          <a href="https://play.google.com/store/apps/details?id=io.wonpay.wallet&hl=ko" target="_blank" rel="noopener"
+             style="display:flex; align-items:center; gap:14px; padding:18px 20px; background:linear-gradient(135deg, #34A853, #1B5E20); color:#fff; border-radius:12px; text-decoration:none; transition:transform .2s, box-shadow .2s;"
+             onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(52,168,83,.3)'"
+             onmouseout="this.style.transform='';this.style.boxShadow=''">
+            <img src="https://play-lh.googleusercontent.com/H75_jjSp7mD58bxrV2P6iFmgo-CJG6P8pSHHzO7occnac-arjBdy3HwVWhNchMjY8beZlMxUnIK-zpfSV8OFZg=w240-h480-rw" alt="Wonpay" style="width:48px; height:48px; border-radius:10px; object-fit:cover; flex-shrink:0; box-shadow:0 2px 6px rgba(0,0,0,.15);" onerror="this.replaceWith(Object.assign(document.createElement('div'),{textContent:'▶️',style:'font-size:36px;'}))">
+            <div style="flex:1;">
+              <div style="font-size:11px; opacity:.85;">GET IT ON</div>
+              <div style="font-size:18px; font-weight:800; letter-spacing:.3px;">Google Play</div>
+              <div style="font-size:12px; opacity:.9; margin-top:2px;">Android 지원 · 무료</div>
+            </div>
+            <div style="font-size:20px;">↗</div>
+          </a>
+
+          <a href="https://apps.apple.com/kr/app/wonpay/id6554001420" target="_blank" rel="noopener"
+             style="display:flex; align-items:center; gap:14px; padding:18px 20px; background:linear-gradient(135deg, #1F1F1F, #000); color:#fff; border-radius:12px; text-decoration:none; transition:transform .2s, box-shadow .2s;"
+             onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(0,0,0,.4)'"
+             onmouseout="this.style.transform='';this.style.boxShadow=''">
+            <div style="font-size:36px;"></div>
+            <div style="flex:1;">
+              <div style="font-size:11px; opacity:.85;">Download on the</div>
+              <div style="font-size:18px; font-weight:800; letter-spacing:.3px;">App Store</div>
+              <div style="font-size:12px; opacity:.9; margin-top:2px;">iOS 지원 · 무료</div>
+            </div>
+            <div style="font-size:20px;">↗</div>
+          </a>
+        </div>
+
+        <h2 style="margin-top:28px;">✨ 주요 기능</h2>
+        <ul>
+          <li><strong>지갑 생성/복구</strong> — 시드 구문(니모닉)으로 안전하게 백업</li>
+          <li><strong>MBC 송수신</strong> — QR 코드로 빠르고 간편한 거래</li>
+          <li><strong>잔액 확인</strong> — 실시간 잔액 및 거래 내역 조회</li>
+          <li><strong>주소록</strong> — 자주 쓰는 지갑 주소 저장</li>
+          <li><strong>토큰 지원</strong> — MBC 기반 토큰(SATOSHI 등) 보유 확인</li>
+        </ul>
+
+        <h2 style="margin-top:28px;">🔐 안전한 사용을 위해</h2>
+        <div class="warn-box">
+          <strong>지갑 사용 시 반드시 지킬 것:</strong>
+          <ul style="margin-top:8px; margin-bottom:0;">
+            <li><strong>시드 구문(니모닉)은 절대 노출 금지</strong> — 종이에 적어 오프라인 보관 권장</li>
+            <li>스크린샷·클라우드 메모·이메일 등 디지털 저장은 해킹 위험</li>
+            <li>본인 외 누구에게도 시드 구문을 알려주지 마세요 (개발자도 묻지 않습니다)</li>
+            <li>앱은 반드시 위 <strong>공식 스토어 링크</strong>에서만 다운로드</li>
+            <li>큰 금액은 콜드월렛(오프라인) 보관 권장</li>
+          </ul>
+        </div>
+
+        <h2 style="margin-top:28px;">❓ 자주 묻는 질문</h2>
+        <div class="step-card">
+          <strong>Q. 시드 구문을 잊어버렸어요</strong>
+          <p>아쉽게도 복구가 불가능합니다. Wonpay는 비수탁(non-custodial) 지갑이라 개발자도 사용자의 시드를 가지고 있지 않습니다. 새 지갑을 만들고 이전 시드는 분실로 처리됩니다.</p>
+        </div>
+        <div class="step-card">
+          <strong>Q. 다른 기기에서 같은 지갑을 쓰고 싶어요</strong>
+          <p>새 기기에 Wonpay 앱을 설치한 뒤 "기존 지갑 복구"를 선택하고 시드 구문을 입력하면 같은 지갑이 복구됩니다.</p>
+        </div>
+        <div class="step-card">
+          <strong>Q. 송금이 안 와요</strong>
+          <p>네트워크 혼잡 시 1~2분 지연될 수 있습니다. 본 사이트 <a onclick="navigate('search'); return false;" style="cursor:pointer; color:var(--mbc-accent);">주소 검색</a>에서 거래 내역을 확인하세요.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────── 페이지: 상장 거래소 ─────────────── -->
+    <section class="page-section" id="page-exchanges">
+      <div class="page-title">💱 <span data-i18n="page_exchanges_title">상장 거래소</span></div>
+      <div class="page-subtitle" data-i18n="page_exchanges_sub">MBC를 거래할 수 있는 암호화폐 거래소 목록</div>
+
+      <div class="warn-box" style="background:#FFF8E1; border-left:4px solid #FFA000; padding:12px 16px; border-radius:6px; font-size:12px; color:#6D4C00; margin-bottom:18px; line-height:1.6;">
+        ⚠️ <span data-i18n="exchanges_warn">아래 거래소 정보는 참고용이며 거래소의 운영 상태·거래량·수수료는 수시로 변경됩니다. 거래 전 반드시 공식 사이트에서 직접 확인하시고, 본인의 책임 하에 거래하세요.</span>
+      </div>
+
+      <div class="exchange-grid">
+
+        <!-- LBank -->
+        <div class="exchange-card">
+          <div class="ex-badge tier1" data-i18n="exchange_active">운영중</div>
+          <div class="ex-banner">
+            <img src="assets/exchanges/lbank.jpg" alt="LBank">
+          </div>
+          <div class="ex-body">
+            <div class="ex-name">LBank</div>
+            <div class="ex-pairs">
+              <span class="ex-pair">MBC/USDT</span>
+            </div>
+            <div class="ex-info" data-i18n="exchange_lbank_info">2015년 설립된 글로벌 암호화폐 거래소. 현재 MBC의 메인 유동성 풀입니다.</div>
+            <a class="ex-btn" href="https://www.lbank.com/trade/mbc_usdt" target="_blank" rel="noopener" data-i18n="exchange_trade_btn">거래하기 ↗</a>
+          </div>
+        </div>
+
+        <!-- CoinMarketCap (정보 카드) -->
+        <div class="exchange-card">
+          <div class="ex-badge tier1" data-i18n="exchange_info">정보</div>
+          <div class="ex-banner" style="background:linear-gradient(135deg,#16005C,#2A1480);">
+            <span style="color:#fff; font-size:28px; font-weight:800; letter-spacing:1px;">MBC 시세</span>
+          </div>
+          <div class="ex-body">
+            <div class="ex-name">CoinMarketCap</div>
+            <div class="ex-pairs">
+              <span class="ex-pair" data-i18n="exchange_all_markets">전체 마켓</span>
+            </div>
+            <div class="ex-info" data-i18n="exchange_cmc_info">실시간 가격, 거래량, 모든 상장 거래소 목록을 확인할 수 있습니다.</div>
+            <a class="ex-btn" href="https://coinmarketcap.com/currencies/microbitcoin/markets/" target="_blank" rel="noopener" data-i18n="exchange_view_btn">목록 보기 ↗</a>
+          </div>
+        </div>
+
+        <!-- 신규 상장 안내 placeholder -->
+        <div class="exchange-card coming-soon">
+          <div class="ex-badge" style="background:#9AA1B0; color:#fff;" data-i18n="exchange_coming">준비중</div>
+          <div class="ex-banner">
+            <span class="ex-banner-text">SOON</span>
+          </div>
+          <div class="ex-body">
+            <div class="ex-name" data-i18n="exchange_more_name">신규 상장 정보</div>
+            <div class="ex-pairs">
+              <span class="ex-pair">- / -</span>
+            </div>
+            <div class="ex-info" data-i18n="exchange_more_info">신규 상장 정보가 들어오면 업데이트됩니다.</div>
+            <a class="ex-btn" data-i18n="exchange_coming_btn">정보 수집 중</a>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="static-card" style="margin-top:24px;">
+        <h2 data-i18n="exchanges_tips_title">거래 전 체크리스트</h2>
+        <ul>
+          <li data-i18n="exchanges_tip1">거래소가 정상 운영 중인지 확인 (입출금 정상, KYC 정책)</li>
+          <li data-i18n="exchanges_tip2">실시간 거래량과 호가창 깊이 확인 (낮은 거래량은 슬리피지 위험)</li>
+          <li data-i18n="exchanges_tip3">출금 수수료와 최소 출금 금액 확인</li>
+          <li data-i18n="exchanges_tip4">2FA(2단계 인증) 필수 설정</li>
+          <li data-i18n="exchanges_tip5">거래소에 장기 보관 금지 — 개인 지갑으로 출금 권장</li>
+        </ul>
+
+        <h3 data-i18n="exchanges_update_title">정보 제보</h3>
+        <p data-i18n="exchanges_update_p">잘못된 정보 또는 새로 상장된 거래소 정보가 있으면 <a onclick="navigate('contact'); return false;" style="cursor:pointer;">문의 페이지</a>로 알려주세요. 빠르게 업데이트하겠습니다.</p>
+      </div>
+    </section>
+
+    <!-- ─────────────── 페이지 5: 사이트 소개 ─────────────── -->
+    <section class="page-section" id="page-about">
+      <div class="page-title">ℹ️ <span data-i18n="page_about_title">사이트 소개</span></div>
+      <div class="page-subtitle" data-i18n="page_about_sub">MBC 홀더 탐색기에 대하여</div>
+
+      <div class="static-card">
+        <h2 data-i18n="about_h1">MicroBitcoin 홀더 탐색기란?</h2>
+        <p data-i18n="about_p1">본 사이트는 <strong>마이크로비트코인(MBC) 네트워크의 전체 홀더 정보</strong>를 누구나 쉽게 조회할 수 있도록 만들어진 커뮤니티 운영 익스플로러입니다.</p>
+        <p data-i18n="about_p2">MBC 풀노드를 직접 운영하며, 블록체인 데이터를 실시간으로 스캔해 모든 활성 주소와 잔액, 토큰 보유 현황을 표시합니다.</p>
+
+        <h3 data-i18n="about_features">주요 기능</h3>
+        <ul>
+          <li data-i18n="about_feat1"><strong>전체 홀더 리스트</strong>: 25,000+ 활성 주소 잔액순 정렬</li>
+          <li data-i18n="about_feat2"><strong>주소 상세 조회</strong>: 거래 내역, 토큰 보유, 입출금 기록</li>
+          <li data-i18n="about_feat3"><strong>실시간 동기화</strong>: 분당 1블록 자동 반영</li>
+          <li data-i18n="about_feat4"><strong>CSV 다운로드</strong>: 데이터 전체 내려받기 가능</li>
+          <li data-i18n="about_feat5"><strong>API 제공</strong>: 개발자용 REST API (<code>/api/holders</code>)</li>
+        </ul>
+
+        <h3 data-i18n="about_stack">기술 스택</h3>
+        <ul>
+          <li data-i18n="about_stack1">MicroBitcoin Core 풀노드 (microd)</li>
+          <li data-i18n="about_stack2">Node.js + Express API 서버</li>
+          <li data-i18n="about_stack3">nginx 정적/리버스 프록시</li>
+          <li data-i18n="about_stack4">Oracle Cloud Always Free Tier</li>
+        </ul>
+
+        <h3 data-i18n="about_disclaimer">면책</h3>
+        <p data-i18n="about_disc1">본 사이트는 MicroBitcoin 공식 단체와 무관한 커뮤니티 운영 사이트입니다. 표시되는 정보는 정확성을 보장하지 않으며, 투자 권유 또는 금융 자문이 아닙니다.</p>
+        <p data-i18n="about_disc2">관련 공식 자료는 <a href="https://microbitcoin.org" target="_blank">microbitcoin.org</a> 및 <a href="https://github.com/MicroBitcoinOrg" target="_blank">GitHub MicroBitcoinOrg</a>를 참고하세요.</p>
+      </div>
+    </section>
+
+    <!-- ─────────────── 페이지 6: 개인정보처리방침 ─────────────── -->
+    <section class="page-section" id="page-privacy">
+      <div class="page-title">🔒 <span data-i18n="page_privacy_title">개인정보처리방침</span></div>
+      <div class="page-subtitle" data-i18n="page_privacy_sub">최종 수정일: 2026년 6월</div>
+
+      <div class="static-card">
+        <h2 data-i18n="priv_h1">1. 수집하는 정보</h2>
+        <p data-i18n="priv_p1">본 사이트는 다음 정보를 자동으로 수집할 수 있습니다.</p>
+        <ul>
+          <li data-i18n="priv_li1">접속 IP 주소 (방문자 통계 목적)</li>
+          <li data-i18n="priv_li2">브라우저 종류 및 운영체제 정보</li>
+          <li data-i18n="priv_li3">접속 일시 및 페이지 이동 경로</li>
+          <li data-i18n="priv_li4">참조 URL</li>
+        </ul>
+
+        <h2 data-i18n="priv_h2">2. 수집 목적</h2>
+        <ul>
+          <li data-i18n="priv_li5">사이트 운영 및 서비스 품질 개선</li>
+          <li data-i18n="priv_li6">익명 통계 분석</li>
+          <li data-i18n="priv_li7">보안 (비정상 접근 차단)</li>
+          <li data-i18n="priv_li8">광고 노출 빈도 최적화</li>
+        </ul>
+
+        <h2 data-i18n="priv_h3">3. 보관 기간</h2>
+        <p data-i18n="priv_p2">접속 로그는 <strong>30일</strong>간 보관 후 자동 삭제됩니다.</p>
+
+        <h2 data-i18n="priv_h4">4. 제3자 제공</h2>
+        <p data-i18n="priv_p3">본 사이트는 수집한 정보를 제3자에게 제공하지 않습니다. 다만 다음 서비스가 자체 수집할 수 있습니다.</p>
+        <ul>
+          <li data-i18n="priv_li9"><strong>Google AdSense</strong>: 광고 게재용 쿠키 및 식별자</li>
+          <li data-i18n="priv_li10"><strong>외부 API</strong>: 거래 내역 조회 시 api.mbc.wiki 호출</li>
+        </ul>
+
+        <h2 data-i18n="priv_h5">5. 쿠키 사용</h2>
+        <p data-i18n="priv_p4">광고 노출과 사이트 환경설정 저장에 쿠키가 사용됩니다.</p>
+
+        <h2 data-i18n="priv_h6">6. 문의</h2>
+        <p data-i18n="priv_p5">개인정보 처리에 관한 문의는 <a onclick="navigate('contact'); return false;" style="cursor:pointer;">문의 페이지</a>를 이용해 주세요.</p>
+      </div>
+    </section>
+
+    <!-- ─────────────── 페이지 7: 문의 ─────────────── -->
+    <section class="page-section" id="page-contact">
+      <div class="page-title">✉️ <span data-i18n="page_contact_title">문의</span></div>
+      <div class="page-subtitle" data-i18n="page_contact_sub">제안, 버그 신고, 협력 문의를 받습니다</div>
+
+      <div class="static-card">
+        <h2 data-i18n="contact_h1">연락 방법</h2>
+        <div class="info-row">
+          <div class="label" data-i18n="contact_email">이메일</div>
+          <div class="value">wsksh@naver.com</div>
+        </div>
+        <div class="info-row">
+          <div class="label" data-i18n="contact_blog">블로그</div>
+          <div class="value"><a href="https://canary77.tistory.com" target="_blank">canary77.tistory.com</a></div>
+        </div>
+        <div class="info-row">
+          <div class="label">GitHub</div>
+          <div class="value"><a href="https://github.com/MicroBitcoinOrg" target="_blank">github.com/MicroBitcoinOrg</a></div>
+        </div>
+
+        <h3 data-i18n="contact_welcome">이런 문의를 환영합니다</h3>
+        <ul>
+          <li data-i18n="contact_w1">홀더 데이터 오류 신고</li>
+          <li data-i18n="contact_w2">새 기능 제안</li>
+          <li data-i18n="contact_w3">API 활용 관련</li>
+          <li data-i18n="contact_w4">광고/협력 제안</li>
+          <li data-i18n="contact_w5">MBC 관련 정보 공유</li>
+        </ul>
+
+        <h3 data-i18n="contact_reply">답변 안내</h3>
+        <p data-i18n="contact_reply_p">모든 문의는 영업일 기준 2~3일 이내 답변 드리도록 노력합니다.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <div class="links">
+      <a onclick="navigate('about'); return false;" data-i18n="footer_about">사이트 소개</a> ·
+      <a onclick="navigate('privacy'); return false;" data-i18n="footer_privacy">개인정보처리방침</a> ·
+      <a onclick="navigate('contact'); return false;" data-i18n="footer_contact">문의</a> ·
+      <a href="https://github.com/MicroBitcoinOrg" target="_blank">GitHub</a>
+    </div>
+    <div data-i18n="footer_copy">© 2026 MBC Holder Explorer · MicroBitcoin 공식 단체와 무관한 커뮤니티 사이트</div>
+    <div class="disclaimer" data-i18n="footer_disclaimer">
+      본 사이트는 정보 제공 목적으로 운영되며 투자 권유나 금융 자문이 아닙니다.
+      암호화폐 투자는 원금 손실 위험이 있으며 모든 결정과 결과의 책임은 본인에게 있습니다.
+    </div>
+  </footer>
+</div>
+
+<!-- ── 우측 사이드 광고 (PC 전용) ── -->
+<aside class="right-ad-rail">
+  <div class="ad-sticky">
+    <span class="ad-label" data-i18n="ad_label">광고</span>
+    <div data-i18n="ad_right">우측 세로 광고<br>(160×600 또는 반응형)<br><br>스크롤해도<br>항상 보임</div>
+  </div>
+</aside>
+
+</div>
+</div>
+
+
+
+  <script src="/assets/app.js?v=1" defer></script>
 </body>
 </html>

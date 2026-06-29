@@ -1,20 +1,22 @@
-# 절대 커밋하면 안 되는 것
-*.pem
-*.key
-.env
-.env.local
-
-# 로그
-*.log
-api.log
-scan.log
-
-# 노드 데이터 (큰 파일)
-.micro/
-.microbitcoin/
 node_modules/
-
-# 임시 파일
+*.log
 .DS_Store
-*.swp
-*~
+# 비밀 / 자격증명
+.admin_config
+.email_config
+.microbitcoin/
+.ssh/
+.pm2/
+# 데이터베이스 (대용량, 매번 변경)
+*.db
+*.db-wal
+*.db-shm
+transfers.db*
+token_holders.json
+token_collector.log
+# 백업 산출물
+backups/
+# 임시
+*.tmp
+*.bak
+*.bak.*

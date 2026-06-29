@@ -1,7 +1,6 @@
 [Unit]
 Description=MBC Incremental Scanner
-After=microd.service
-Requires=microd.service
+After=network.target
 
 [Service]
 Type=simple

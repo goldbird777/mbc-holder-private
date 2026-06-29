@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>MBC 관리자</title>
+<style>
+  :root {
+    --navy: #16005C;
+    --navy-dark: #0D0033;
+    --accent: #4F3BFF;
+    --gold: #F5A623;
+    --green: #2E7D32;
+    --red: #C62828;
+    --bg: #FFFFFF;
+    --bg-soft: #F8F9FC;
+    --border: #E8EAF0;
+    --text: #1A1A2E;
+    --text-sub: #6B6B80;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, '맑은 고딕', sans-serif; background: var(--bg-soft); color: var(--text); min-height: 100vh; }
+  a { color: var(--accent); }
+
+  header { background: var(--navy); color: #fff; padding: 14px 22px; display: flex; align-items: center; justify-content: space-between; gap: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.15); position: sticky; top: 0; z-index: 10; }
+  header h1 { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+  header .right { display: flex; align-items: center; gap: 12px; font-size: 12px; }
+  header a { color: #C7C9D9; text-decoration: none; }
+  header a:hover { color: #fff; }
+  header button { background: var(--gold); color: var(--navy-dark); border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 28px 20px; }
+
+  /* 로그인 */
+  .login-card { max-width: 380px; margin: 60px auto; background: #fff; border-radius: 12px; padding: 32px 28px; box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+  .login-card h2 { font-size: 18px; color: var(--navy); margin-bottom: 18px; text-align: center; }
+  .login-card label { display: block; font-size: 12px; color: var(--text-sub); font-weight: 700; margin-bottom: 6px; }
+  .login-card input { width: 100%; padding: 12px 14px; background: var(--bg-soft); border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; }
+  .login-card input:focus { border-color: var(--accent); background: #fff; }
+  .login-card button { width: 100%; margin-top: 14px; padding: 12px; background: var(--navy); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; }
+  .login-card button:hover { background: var(--accent); }
+  .login-error { color: var(--red); font-size: 12px; margin-top: 10px; text-align: center; min-height: 18px; }
+
+  /* 탭 */
+  .tabs { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+  .tab { background: #fff; color: var(--navy); border: 1.5px solid var(--border); padding: 9px 18px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; transition: all .15s; }
+  .tab:hover { border-color: var(--accent); color: var(--accent); }
+  .tab.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+  /* 작성 폼 */
+  .form-card { background: #fff; border-radius: 12px; padding: 22px 24px; box-shadow: 0 1px 4px rgba(0,0,0,.05); margin-bottom: 18px; }
+  .form-card h3 { font-size: 15px; color: var(--navy); margin-bottom: 14px; }
+  .form-card label { display: block; font-size: 12px; color: var(--text-sub); font-weight: 700; margin: 10px 0 4px; }
+  .form-card input, .form-card textarea { width: 100%; padding: 10px 12px; background: var(--bg-soft); border: 1.5px solid var(--border); border-radius: 6px; font-size: 13px; font-family: inherit; outline: none; resize: vertical; }
+  .form-card textarea { min-height: 140px; }
+  .form-card input:focus, .form-card textarea:focus { border-color: var(--accent); background: #fff; }
+  .form-actions { display: flex; gap: 8px; margin-top: 14px; }
+  .form-actions button { padding: 10px 20px; border: none; border-radius: 6px; font-weight: 700; font-size: 13px; cursor: pointer; }
+  .btn-primary { background: var(--navy); color: #fff; }
+  .btn-primary:hover { background: var(--accent); }
+  .btn-secondary { background: var(--bg-soft); color: var(--text-sub); border: 1.5px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--text-sub); }
+
+  /* 목록 */
+  .list-card { background: #fff; border-radius: 12px; padding: 16px 18px; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+  .list-card h3 { font-size: 14px; color: var(--navy); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .list-item { padding: 12px 4px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: flex-start; }
+  .list-item:last-child { border-bottom: none; }
+  .list-item .body { flex: 1; min-width: 0; }
+  .list-item .title { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 4px; word-break: break-word; }
+  .list-item .meta { font-size: 11px; color: var(--text-sub); margin-bottom: 6px; }
+  .list-item .content { font-size: 12px; color: var(--text-sub); line-height: 1.5; white-space: pre-wrap; word-break: break-word; max-height: 60px; overflow: hidden; position: relative; }
+  .list-item .content::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 20px; background: linear-gradient(transparent, #fff); }
+  .list-item .actions { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+  .list-item button { padding: 5px 12px; font-size: 11px; border: none; border-radius: 4px; cursor: pointer; font-weight: 700; }
+  .btn-edit { background: #FFF8E1; color: #6D4C00; }
+  .btn-edit:hover { background: var(--gold); color: var(--navy-dark); }
+  .btn-delete { background: #FFEBEE; color: var(--red); }
+  .btn-delete:hover { background: var(--red); color: #fff; }
+
+  .empty { text-align: center; padding: 30px 10px; color: #999; font-size: 13px; }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 13px; box-shadow: 0 4px 16px rgba(0,0,0,.2); opacity: 0; transition: opacity .25s; pointer-events: none; z-index: 999; }
+  .toast.show { opacity: 1; }
+  .toast.error { background: var(--red); }
+
+  @media (max-width: 600px) {
+    main { padding: 18px 12px; }
+    header { padding: 12px 14px; }
+    .list-item { flex-direction: column; }
+    .list-item .actions { flex-direction: row; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🛠 MBC 관리자</h1>
+  <div class="right">
+    <a href="/" target="_blank">사이트 열기 ↗</a>
+    <button id="logoutBtn" onclick="logout()" style="display:none;">로그아웃</button>
+  </div>
+</header>
+
+<main>
+
+<!-- 로그인 화면 -->
+<div id="loginView">
+  <div class="login-card">
+    <h2>🔐 관리자 로그인</h2>
+    <label>비밀번호</label>
+    <input type="password" id="pwInput" autofocus onkeydown="if(event.key==='Enter') doLogin()">
+    <button onclick="doLogin()">로그인</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- 관리 화면 -->
+<div id="adminView" style="display:none;">
+  <div class="tabs">
+    <div class="tab active" data-type="news" onclick="switchType('news')">📰 최근 소식</div>
+    <div class="tab" data-type="qna" onclick="switchType('qna')">❓ Q&amp;A</div>
+    <div class="tab" data-type="links" onclick="switchType('links')">🔗 관련 사이트</div>
+    <div class="tab" data-type="tokens" onclick="switchType('tokens')">🪙 MBC2 토큰</div>
+    <div class="tab" data-type="pools" onclick="switchType('pools')">🏊 채굴풀 주소</div>
+    <div class="tab" data-type="donate" onclick="switchType('donate')">☕ 후원 주소</div>
+  </div>
+
+  <!-- 일반 게시판 UI -->
+  <div id="standardUI">
+    <div class="form-card">
+      <h3 id="formTitle">새 항목 작성</h3>
+      <div id="formFields"></div>
+      <div class="form-actions">
+        <button class="btn-primary" id="saveBtn" onclick="saveItem()">저장</button>
+        <button class="btn-secondary" onclick="resetForm()">초기화</button>
+      </div>
+    </div>
+    <div class="list-card">
+      <h3 id="listTitle">기존 항목</h3>
+      <div id="itemList"></div>
+    </div>
+  </div>
+
+  <!-- 후원 주소 관리 UI -->
+  <div id="donateUI" style="display:none;">
+    <div class="form-card">
+      <h3>☕ 후원 주소 관리 (3채널)</h3>
+      <div style="background:#FFF8E1; border-left:4px solid var(--gold); padding:10px 14px; border-radius:6px; font-size:12px; color:#6D4C00; margin-bottom:14px; line-height:1.6;">
+        💡 사이트 상단 후원 바에 3개 탭(BTC / MBC / USDT-TRC20)으로 표시됩니다. 주소가 비어 있는 채널은 사용자에게 "주소 미등록"으로 표시됩니다.
+      </div>
+
+      <div id="donateChannels"></div>
+
+      <div class="form-actions" style="margin-top:18px;">
+        <button class="btn-primary" onclick="saveDonate()">전체 저장</button>
+        <button class="btn-secondary" onclick="loadDonateForAdmin()">변경 취소(다시 로드)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 풀 주소 관리 UI -->
+  <div id="poolsUI" style="display:none;">
+    <div class="form-card">
+      <h3>🏊 새 풀 주소 등록</h3>
+      <div style="background:#FFF8E1; border-left:4px solid var(--gold); padding:10px 14px; border-radius:6px; font-size:12px; color:#6D4C00; margin-bottom:14px; line-height:1.6;">
+        💡 등록된 주소가 보낸 트랜잭션은 사이트의 <strong>트랜잭션 페이지</strong>에서 "🏊 풀 분배 제외" 체크 시 결과에서 빠집니다. 등록·삭제 시 기존 DB 전체에 즉시 반영됩니다 (수만 건도 1초 이내).
+      </div>
+      <label>풀 주소 (필수)</label>
+      <input type="text" id="pool_address" placeholder="B / b / mbc1q 로 시작 (예: MfAUEfrSfB9MUd...)">
+      <label>라벨 (선택, 풀 이름 등)</label>
+      <input type="text" id="pool_label" placeholder="예: zpool.ca / rplant / 자동 추정">
+      <div class="form-actions">
+        <button class="btn-primary" onclick="addPool()">추가</button>
+        <button class="btn-secondary" onclick="document.getElementById('pool_address').value=''; document.getElementById('pool_label').value='';">초기화</button>
+      </div>
+    </div>
+
+    <div class="list-card" style="margin-bottom:18px;">
+      <h3>등록된 풀 주소 <span id="poolCountBadge" style="background:var(--gold); color:var(--navy-dark); padding:2px 10px; border-radius:10px; font-size:12px; font-weight:700; margin-left:8px;">-</span> <span id="poolTaggedBadge" style="font-size:12px; color:var(--text-sub); font-weight:600; margin-left:6px;"></span></h3>
+      <div id="poolList"><div class="empty">불러오는 중…</div></div>
+    </div>
+
+    <div class="list-card">
+      <h3>🔍 풀 후보 자동 추출 <span style="font-size:12px; color:var(--text-sub); font-weight:600;">(송금 횟수 많은 순)</span></h3>
+      <div style="background:#E3F2FD; border-left:4px solid var(--accent); padding:10px 14px; border-radius:6px; font-size:12px; color:var(--navy); margin-bottom:14px; line-height:1.6;">
+        💡 DB에 누적된 트랜잭션에서 송금 횟수가 많은 주소를 자동 추출합니다. 풀이 분배하는 패턴이라 신뢰도 높음. 거래소 출금 wallet도 같이 나올 수 있으니 라벨 적어두세요.
+      </div>
+      <div id="candidateList"><div class="empty">불러오는 중…</div></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let TOKEN = sessionStorage.getItem('admin_token') || '';
+let currentType = 'news';
+let editingId = null;
+
+function toast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => { t.className = 'toast' + (isError ? ' error' : ''); }, 2400);
+}
+
+async function api(path, opts) {
+  opts = opts || {};
+  opts.headers = opts.headers || {};
+  if (TOKEN) opts.headers['Authorization'] = 'Bearer ' + TOKEN;
+  if (opts.body && typeof opts.body !== 'string') {
+    opts.body = JSON.stringify(opts.body);
+    opts.headers['Content-Type'] = 'application/json';
+  }
+  const res = await fetch(path, opts);
+  let data = null;
+  try { data = await res.json(); } catch (e) {}
+  if (!res.ok) throw new Error((data && data.error) || ('HTTP ' + res.status));
+  return data;
+}
+
+async function checkAuth() {
+  if (!TOKEN) { showLogin(); return; }
+  try {
+    const r = await api('/api/admin/check');
+    if (r.admin) showAdmin();
+    else showLogin();
+  } catch (e) { showLogin(); }
+}
+
+function showLogin() {
+  document.getElementById('loginView').style.display = 'block';
+  document.getElementById('adminView').style.display = 'none';
+  document.getElementById('logoutBtn').style.display = 'none';
+  setTimeout(() => document.getElementById('pwInput').focus(), 50);
+}
+
+function showAdmin() {
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('adminView').style.display = 'block';
+  document.getElementById('logoutBtn').style.display = 'inline-block';
+  switchType(currentType);
+}
+
+async function doLogin() {
+  const pw = document.getElementById('pwInput').value;
+  const err = document.getElementById('loginError');
+  err.textContent = '';
+  if (!pw) { err.textContent = '비밀번호를 입력하세요'; return; }
+  try {
+    const r = await api('/api/admin/login', { method: 'POST', body: { password: pw } });
+    TOKEN = r.token;
+    sessionStorage.setItem('admin_token', TOKEN);
+    document.getElementById('pwInput').value = '';
+    showAdmin();
+    toast('로그인 성공');
+  } catch (e) {
+    err.textContent = e.message || '로그인 실패';
+  }
+}
+
+async function logout() {
+  try { await api('/api/admin/logout', { method: 'POST' }); } catch (e) {}
+  TOKEN = '';
+  sessionStorage.removeItem('admin_token');
+  showLogin();
+}
+
+function switchType(type) {
+  currentType = type;
+  editingId = null;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.type === type));
+
+  if (type === 'pools') {
+    document.getElementById('standardUI').style.display = 'none';
+    document.getElementById('poolsUI').style.display = 'block';
+    document.getElementById('donateUI').style.display = 'none';
+    clearPoolCache();
+    loadPools(true);
+    loadPoolCandidates(true);
+  } else if (type === 'donate') {
+    document.getElementById('standardUI').style.display = 'none';
+    document.getElementById('poolsUI').style.display = 'none';
+    document.getElementById('donateUI').style.display = 'block';
+    loadDonateForAdmin();
+  } else {
+    document.getElementById('standardUI').style.display = 'block';
+    document.getElementById('poolsUI').style.display = 'none';
+    document.getElementById('donateUI').style.display = 'none';
+    renderForm();
+    loadList();
+  }
+}
+
+// ── 후원 주소 관리 ─────────────────────────────────────
+const DONATE_KEYS = [
+  { key: 'btc', icon: '₿', defaultLabel: 'Bitcoin (BTC)', defaultNetwork: 'BTC Network' },
+  { key: 'mbc', icon: '⚡', defaultLabel: 'MicroBitcoin (MBC)', defaultNetwork: 'MBC Network' },
+  { key: 'usdt', icon: '💵', defaultLabel: 'USDT (TRC20)', defaultNetwork: 'Tron Network (TRC20)' }
+];
+
+async function loadDonateForAdmin() {
+  const container = document.getElementById('donateChannels');
+  container.innerHTML = '<div class="empty">불러오는 중…</div>';
+  try {
+    const res = await fetch('/api/donate');
+    const data = await res.json();
+    container.innerHTML = DONATE_KEYS.map(d => {
+      const ch = data[d.key] || {};
+      const addr = ch.address || '';
+      const label = ch.label || d.defaultLabel;
+      const network = ch.network || d.defaultNetwork;
+      return `
+        <div style="background:var(--bg-soft); padding:14px 16px; border-radius:8px; margin-bottom:12px;">
+          <div style="font-size:14px; font-weight:800; color:var(--navy); margin-bottom:10px;">${d.icon} ${esc(d.defaultLabel)}</div>
+          <label style="font-size:11px; color:var(--text-sub); font-weight:700;">주소</label>
+          <input type="text" data-donate-field="${d.key}.address" value="${esc(addr)}" placeholder="입력 시 즉시 사이트에 반영됨">
+          <label style="font-size:11px; color:var(--text-sub); font-weight:700;">네트워크 (선택, 표시용)</label>
+          <input type="text" data-donate-field="${d.key}.network" value="${esc(network)}" placeholder="예: Tron Network (TRC20)">
+        </div>
+      `;
+    }).join('');
+  } catch (e) {
+    if (/401|unauthorized/i.test(e.message)) { TOKEN=''; sessionStorage.removeItem('admin_token'); showLogin(); return; }
+    container.innerHTML = '<div class="empty" style="color:var(--red);">로드 실패: ' + esc(e.message) + '</div>';
+  }
+}
+
+async function saveDonate() {
+  const body = {};
+  document.querySelectorAll('[data-donate-field]').forEach(el => {
+    const [key, field] = el.dataset.donateField.split('.');
+    if (!body[key]) body[key] = {};
+    body[key][field] = el.value.trim();
+  });
+  try {
+    await api('/api/admin/donate', { method: 'PUT', body: body });
+    toast('후원 주소 저장됨 · 사이트 즉시 반영');
+  } catch (e) {
+    if (/401|unauthorized/i.test(e.message)) { TOKEN=''; sessionStorage.removeItem('admin_token'); showLogin(); return; }
+    toast(e.message, true);
+  }
+}
+
+// ── 풀 주소 관리 ─────────────────────────────────────
+// sessionStorage 캐시 (5분) — 탭 전환 시 즉시 표시
+const POOL_CACHE_TTL = 5 * 60 * 1000;
+function getPoolCache(key) {
+  try {
+    const raw = sessionStorage.getItem('pc:' + key);
+    if (!raw) return null;
+    const o = JSON.parse(raw);
+    if (Date.now() - o.t > POOL_CACHE_TTL) { sessionStorage.removeItem('pc:' + key); return null; }
+    return o.d;
+  } catch (e) { return null; }
+}
+function setPoolCache(key, data) {
+  try { sessionStorage.setItem('pc:' + key, JSON.stringify({ t: Date.now(), d: data })); } catch (e) {}
+}
+function clearPoolCache() {
+  try {
+    sessionStorage.removeItem('pc:pools');
+    sessionStorage.removeItem('pc:candidates');
+  } catch (e) {}
+}
+
+async function loadPools(force) {
+  const listEl = document.getElementById('poolList');
+  const countEl = document.getElementById('poolCountBadge');
+  const taggedEl = document.getElementById('poolTaggedBadge');
+  // 캐시 활용
+  if (!force) {
+    const cached = getPoolCache('pools');
+    if (cached) { renderPools(cached, listEl, countEl, taggedEl); return; }
+  }
+  listEl.innerHTML = '<div class="empty">불러오는 중…</div>';
+  try {
+    const data = await api('/api/admin/pools');
+    setPoolCache('pools', data);
+    renderPools(data, listEl, countEl, taggedEl);
+  } catch (e) {
+    if (/401|unauthorized/i.test(e.message)) { TOKEN=''; sessionStorage.removeItem('admin_token'); showLogin(); return; }
+    listEl.innerHTML = '<div class="empty" style="color:var(--red);">로드 실패: ' + esc(e.message) + '</div>';
+  }
+}
+
+function renderPools(data, listEl, countEl, taggedEl) {
+  try {
+    const items = data.addresses || [];
+    countEl.textContent = items.length;
+    taggedEl.textContent = '· DB에 ' + (data.taggedCount || 0).toLocaleString() + '건 마킹됨';
+    if (items.length === 0) {
+      listEl.innerHTML = '<div class="empty">등록된 풀 주소가 없습니다. 위에서 추가하거나 아래 후보에서 선택하세요.</div>';
+      return;
+    }
+    listEl.innerHTML = items.map(it => {
+      const label = it.label ? `<span style="background:var(--gold); color:var(--navy-dark); padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; margin-left:6px;">${esc(it.label)}</span>` : '';
+      return `
+        <div class="list-item">
+          <div class="body">
+            <div class="title" style="font-family:'Consolas',monospace; font-size:13px; word-break:break-all;">${esc(it.address)}${label}</div>
+          </div>
+          <div class="actions">
+            <button class="btn-edit" onclick="editPoolLabel('${esc(it.address)}', '${esc(it.label || '')}')">라벨 수정</button>
+            <button class="btn-delete" onclick="deletePool('${esc(it.address)}')">삭제</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (e) {
+    if (/401|unauthorized/i.test(e.message)) { TOKEN=''; sessionStorage.removeItem('admin_token'); showLogin(); return; }
+    listEl.innerHTML = '<div class="empty" style="color:var(--red);">로드 실패: ' + esc(e.message) + '</div>';
+  }
+}
+
+async function loadPoolCandidates(force) {
+  const listEl = document.getElementById('candidateList');
+  if (!force) {
+    const cached = getPoolCache('candidates');
+    if (cached) { renderPoolCandidates(cached, listEl); return; }
+  }
+  listEl.innerHTML = '<div class="empty">불러오는 중… (DB 스캔, 최대 10초)</div>';
+  try {
+    const data = await api('/api/admin/pools/candidates?minCount=5&limit=30');
+    setPoolCache('candidates', data);
+    renderPoolCandidates(data, listEl);
+  } catch (e) {
+    if (/401|unauthorized/i.test(e.message)) { TOKEN=''; sessionStorage.removeItem('admin_token'); showLogin(); return; }
+    listEl.innerHTML = '<div class="empty" style="color:var(--red);">로드 실패: ' + esc(e.message) + '</div>';
+    return;
+  }
+}
+
+function renderPoolCandidates(data, listEl) {
+  try {
+    const items = data.candidates || [];
+    if (items.length === 0) {
+      listEl.innerHTML = '<div class="empty">DB에 데이터가 부족합니다.</div>';
+      return;
+    }
+    listEl.innerHTML = items.map(c => {
+      const status = c.registered
+        ? `<span style="background:#E8F5E9; color:var(--green); padding:3px 10px; border-radius:4px; font-size:11px; font-weight:700;">✓ 등록됨</span>`
+        : `<button class="btn-edit" style="background:var(--accent); color:#fff;" onclick="addCandidate('${esc(c.address)}')">+ 등록</button>`;
+      return `
+        <div class="list-item">
+          <div class="body">
+            <div class="title" style="font-family:'Consolas',monospace; font-size:12px; word-break:break-all;">${esc(c.address)}</div>
+            <div class="meta">송금 횟수: <strong>${c.count.toLocaleString()}</strong>건</div>
+          </div>
+          <div class="actions">${status}</div>
+        </div>
+      `;
+    }).join('');
+  } catch (e) {
+    if (/401|unauthorized/i.test(e.message)) { TOKEN=''; sessionStorage.removeItem('admin_token'); showLogin(); return; }
+    listEl.innerHTML = '<div class="empty" style="color:var(--red);">로드 실패: ' + esc(e.message) + '</div>';
+  }
+}
+
+async function addPool() {
+  const addr = document.getElementById('pool_address').value.trim();
+  const label = document.getElementById('pool_label').value.trim();
+  if (!addr) { toast('주소를 입력하세요', true); return; }
+  try {
+    const r = await api('/api/admin/pools', { method: 'POST', body: { address: addr, label: label } });
+    toast('등록됨 · DB에 ' + (r.taggedTotal || 0).toLocaleString() + '건 마킹');
+    document.getElementById('pool_address').value = '';
+    document.getElementById('pool_label').value = '';
+    clearPoolCache();
+    loadPools(true);
+    loadPoolCandidates(true);
+  } catch (e) {
+    if (/401|unauthorized/i.test(e.message)) { TOKEN=''; sessionStorage.removeItem('admin_token'); showLogin(); return; }
+    toast(e.message, true);
+  }
+}
+
+async function addCandidate(addr) {
+  const label = prompt('라벨 (선택, Enter로 건너뛰기)\n주소: ' + addr, '자동 추출');
+  if (label === null) return;  // 취소
+  try {
+    const r = await api('/api/admin/pools', { method: 'POST', body: { address: addr, label: label.trim() } });
+    toast('등록됨 · DB에 ' + (r.taggedTotal || 0).toLocaleString() + '건 마킹');
+    clearPoolCache();
+    loadPools(true);
+    loadPoolCandidates(true);
+  } catch (e) {
+    if (/401|unauthorized/i.test(e.message)) { TOKEN=''; sessionStorage.removeItem('admin_token'); showLogin(); return; }
+    toast(e.message, true);
+  }
+}
+
+async function deletePool(addr) {
+  if (!confirm('이 풀 주소를 삭제하시겠습니까?\n' + addr + '\n\nDB의 is_pool 마킹도 함께 해제됩니다.')) return;
+  try {
+    const r = await api('/api/admin/pools/' + encodeURIComponent(addr), { method: 'DELETE' });
+    toast('삭제됨 · DB에 ' + (r.taggedTotal || 0).toLocaleString() + '건 마킹');
+    clearPoolCache();
+    loadPools(true);
+    loadPoolCandidates(true);
+  } catch (e) {
+    if (/401|unauthorized/i.test(e.message)) { TOKEN=''; sessionStorage.removeItem('admin_token'); showLogin(); return; }
+    toast(e.message, true);
+  }
+}
+
+async function editPoolLabel(addr, current) {
+  const label = prompt('새 라벨 입력', current || '');
+  if (label === null) return;
+  try {
+    await api('/api/admin/pools/' + encodeURIComponent(addr), { method: 'PUT', body: { label: label.trim() } });
+    toast('라벨 수정됨');
+    clearPoolCache();
+    loadPools(true);
+  } catch (e) {
+    if (/401|unauthorized/i.test(e.message)) { TOKEN=''; sessionStorage.removeItem('admin_token'); showLogin(); return; }
+    toast(e.message, true);
+  }
+}
+
+function renderForm() {
+  const fc = document.getElementById('formFields');
+  if (currentType === 'links') {
+    fc.innerHTML = `
+      <label>사이트 이름</label>
+      <input type="text" id="f_name" placeholder="예: MicroBitcoin 공식 사이트">
+      <label>URL</label>
+      <input type="text" id="f_url" placeholder="https://...">
+      <label>설명 (선택)</label>
+      <input type="text" id="f_description" placeholder="간단한 설명">
+    `;
+  } else if (currentType === 'tokens') {
+    fc.innerHTML = `
+      <label>티커 (예: SATOSHI, BTS, KRWS)</label>
+      <input type="text" id="f_ticker" placeholder="SATOSHI" style="text-transform:uppercase;">
+      <label>토큰 이름</label>
+      <input type="text" id="f_name" placeholder="예: Satoshi Token">
+      <label>설명</label>
+      <textarea id="f_description" placeholder="토큰에 대한 설명, 용도 등"></textarea>
+      <label>최대 발행량 (선택)</label>
+      <input type="text" id="f_supply" placeholder="예: 21,000,000">
+      <label>관련 URL (선택)</label>
+      <input type="text" id="f_url" placeholder="https://...">
+      <label>토큰 아이콘 (선택, 최대 1MB · png/jpg/gif/svg/webp)</label>
+      <div style="display:flex; gap:10px; align-items:center; margin-top:4px;">
+        <img id="f_iconPreview" src="" alt="" style="width:48px; height:48px; border-radius:50%; border:1.5px solid var(--border); background:var(--bg-soft); object-fit:cover; display:none;">
+        <input type="file" id="f_iconFile" accept="image/png,image/jpeg,image/gif,image/svg+xml,image/webp" onchange="onIconFileChange(event)" style="font-size:12px; border:none; padding:0; background:transparent;">
+        <button type="button" onclick="clearIcon()" style="padding:6px 12px; background:#FFEBEE; color:var(--red); border:none; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;">제거</button>
+      </div>
+      <input type="hidden" id="f_iconUrl" value="">
+      <div id="iconUploadStatus" style="font-size:11px; color:var(--text-sub); margin-top:6px;"></div>
+
+      <label style="margin-top:16px;">백서 (PDF, 선택)</label>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:4px;">
+        <input type="file" id="f_whitepaperFile" accept="application/pdf" onchange="onWhitepaperFileChange(event)" style="font-size:12px; border:none; padding:0; background:transparent;">
+        <span style="font-size:11px; color:var(--text-sub);">또는 외부 URL ↓</span>
+      </div>
+      <input type="text" id="f_whitepaperUrl" placeholder="https://... (외부 PDF URL 또는 업로드 후 자동 설정)" style="margin-top:6px;">
+      <div id="whitepaperUploadStatus" style="font-size:11px; color:var(--text-sub); margin-top:4px;"></div>
+      <div style="font-size:10px; color:var(--text-sub); margin-top:4px;">📄 PDF 업로드 시 최대 8MB · 또는 외부 호스팅 URL 직접 입력</div>
+    `;
+  } else {
+    fc.innerHTML = `
+      <label>${currentType === 'qna' ? '질문' : '제목'}</label>
+      <input type="text" id="f_title" placeholder="${currentType === 'qna' ? '질문 내용' : '소식 제목'}">
+      <label>${currentType === 'qna' ? '답변' : '본문'}</label>
+      <textarea id="f_content" placeholder="${currentType === 'qna' ? '답변 내용' : '본문 내용'}"></textarea>
+    `;
+  }
+  document.getElementById('formTitle').textContent = editingId ? '항목 수정' : '새 항목 작성';
+}
+
+function resetForm() {
+  editingId = null;
+  renderForm();
+}
+
+async function loadList() {
+  const listEl = document.getElementById('itemList');
+  const labelMap = { news: '소식 목록', qna: 'Q&A 목록 (사용자 글 + 답글 관리)', links: '관련 사이트 목록', tokens: 'MBC 레이어2 토큰 목록' };
+  document.getElementById('listTitle').textContent = labelMap[currentType];
+  listEl.innerHTML = '<div class="empty">불러오는 중…</div>';
+  try {
+    // Q&A는 새 endpoint (/api/qna) 사용
+    const url = currentType === 'qna' ? '/api/qna?perPage=100' : '/api/board/' + currentType;
+    const data = await api(url);
+    const items = data.items || [];
+    if (items.length === 0) {
+      listEl.innerHTML = '<div class="empty">아직 등록된 항목이 없습니다.</div>';
+      return;
+    }
+    const canReorder = (currentType === 'links' || currentType === 'tokens');
+    listEl.innerHTML = items.map((it, i) => {
+      let title, sub, content;
+      if (currentType === 'links') { title = it.name; sub = it.url; content = it.description; }
+      else if (currentType === 'tokens') { title = (it.ticker || '?') + ' · ' + (it.name || ''); sub = it.supply ? '최대 발행: ' + it.supply : ''; content = it.description; }
+      else if (currentType === 'qna') {
+        title = it.title;
+        sub = '작성자: ' + (it.author || '익명') + (it.hasReply ? ' · 답변완료' : ' · 답변대기');
+        content = it.content;
+      }
+      else { title = it.title; sub = ''; content = it.content; }
+      const meta = new Date(it.createdAt).toLocaleString('ko-KR');
+      // 순서 변경 버튼 (links/tokens 한정)
+      const reorderBtns = canReorder
+        ? `<button class="btn-edit" onclick="moveItem('${it.id}','up')" ${i === 0 ? 'disabled' : ''} title="위로" style="padding:6px 10px;">↑</button>
+           <button class="btn-edit" onclick="moveItem('${it.id}','down')" ${i === items.length - 1 ? 'disabled' : ''} title="아래로" style="padding:6px 10px;">↓</button>`
+        : '';
+      // Q&A는 답글 작성/삭제 버튼만 (글 자체는 작성자 비밀번호로만 수정 가능)
+      const actions = currentType === 'qna'
+        ? `<button class="btn-edit" onclick="openQnaReplyModal('${it.id}', ${(it.replies||[]).length})">답글 (${(it.replies||[]).length})</button>
+           <button class="btn-delete" onclick="deleteQnaAsAdmin('${it.id}')">삭제</button>`
+        : `${reorderBtns}
+           <button class="btn-edit" onclick="startEdit('${it.id}')">수정</button>
+           <button class="btn-delete" onclick="deleteItem('${it.id}')">삭제</button>`;
+      return `
+        <div class="list-item">
+          <div class="body">
+            <div class="title">${esc(title || '(제목 없음)')}</div>
+            <div class="meta">${meta}${sub ? ' · ' + esc(sub) : ''}</div>
+            ${content ? `<div class="content">${esc(content)}</div>` : ''}
+          </div>
+          <div class="actions">${actions}</div>
+        </div>
+      `;
+    }).join('');
+  } catch (e) {
+    if (/401|unauthorized/i.test(e.message)) { TOKEN=''; sessionStorage.removeItem('admin_token'); showLogin(); return; }
+    listEl.innerHTML = '<div class="empty" style="color:var(--red);">로드 실패: ' + esc(e.message) + '</div>';
+  }
+}
+
+// ── Q&A 답글 관리 ─────────────────────────────────────
+async function openQnaReplyModal(id, replyCount) {
+  let qna;
+  try {
+    qna = await api('/api/qna/' + id);
+  } catch (e) { toast('로드 실패: ' + e.message, true); return; }
+  const repliesHtml = (qna.replies || []).map((r, i) => `
+    <div style="background:#E3F2FD; padding:10px 12px; border-radius:6px; margin-bottom:8px;">
+      <div style="font-size:11px; color:var(--text-sub); margin-bottom:4px;">${new Date(r.createdAt).toLocaleString('ko-KR')}</div>
+      <div style="font-size:13px; white-space:pre-wrap; word-break:break-word; margin-bottom:6px;">${esc(r.content)}</div>
+      <button onclick="deleteQnaReply('${id}', ${i})" style="padding:4px 10px; background:#FFEBEE; color:var(--red); border:none; border-radius:3px; font-size:11px; font-weight:700; cursor:pointer;">삭제</button>
+    </div>
+  `).join('');
+  const html = `
+    <div id="qnaReplyBackdrop" style="position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:9999; display:flex; align-items:center; justify-content:center; padding:14px;" onclick="if(event.target===this) document.getElementById('qnaReplyBackdrop').remove()">
+      <div style="background:#fff; border-radius:10px; padding:22px; max-width:560px; width:100%; max-height:90vh; overflow-y:auto;">
+        <h3 style="margin-bottom:12px; color:var(--navy);">💬 답글 관리 — ${esc(qna.title)}</h3>
+        <div style="background:var(--bg-soft); padding:10px 12px; border-radius:6px; font-size:12px; margin-bottom:12px; white-space:pre-wrap;">${esc(qna.content)}</div>
+        <div style="margin-bottom:12px;">${repliesHtml || '<div class="empty" style="font-size:12px;">아직 답글 없음</div>'}</div>
+        <label style="font-size:11px; color:var(--text-sub); font-weight:700;">새 답글</label>
+        <textarea id="qnaReplyContent" placeholder="답글 내용" style="width:100%; min-height:100px; padding:8px 10px; border:1.5px solid var(--border); border-radius:5px; font-size:13px; margin:4px 0 10px;"></textarea>
+        <div style="display:flex; gap:6px; justify-content:flex-end;">
+          <button onclick="document.getElementById('qnaReplyBackdrop').remove()" style="padding:8px 16px; background:#fff; color:var(--text-sub); border:1.5px solid var(--border); border-radius:5px; font-weight:700; cursor:pointer;">닫기</button>
+          <button onclick="submitQnaReply('${id}')" style="padding:8px 16px; background:var(--navy); color:#fff; border:none; border-radius:5px; font-weight:700; cursor:pointer;">답글 등록</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+async function submitQnaReply(id) {
+  const content = document.getElementById('qnaReplyContent').value.trim();
+  if (!content) { toast('답글 내용을 입력하세요', true); return; }
+  try {
+    await api('/api/qna/' + id + '/reply', { method: 'POST', body: { content: content } });
+    document.getElementById('qnaReplyBackdrop').remove();
+    toast('답글 등록됨');
+    loadList();
+  } catch (e) { toast(e.message, true); }
+}
+
+async function deleteQnaReply(id, idx) {
+  if (!confirm('이 답글을 삭제하시겠습니까?')) return;
+  try {
+    await api('/api/qna/' + id + '/reply/' + idx, { method: 'DELETE' });
+    document.getElementById('qnaReplyBackdrop').remove();
+    toast('답글 삭제됨');
+    loadList();
+  } catch (e) { toast(e.message, true); }
+}
+
+async function deleteQnaAsAdmin(id) {
+  if (!confirm('이 글을 영구 삭제하시겠습니까? (관리자 권한)')) return;
+  try {
+    await api('/api/qna/' + id, { method: 'DELETE' });
+    toast('삭제되었습니다');
+    loadList();
+  } catch (e) { toast(e.message, true); }
+}
+
+// ── 토큰 아이콘 업로드/미리보기 ──────────────────────
+function onIconFileChange(e) {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  if (f.size > 1024 * 1024) { toast('이미지가 1MB를 초과합니다', true); e.target.value=''; return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const dataUrl = reader.result;
+    const preview = document.getElementById('f_iconPreview');
+    preview.src = dataUrl;
+    preview.style.display = 'inline-block';
+    document.getElementById('f_iconUrl').value = dataUrl;  // 임시: 저장 시 base64를 서버에 업로드
+    document.getElementById('iconUploadStatus').textContent = '대기 중 (저장 누르면 업로드됩니다)';
+  };
+  reader.readAsDataURL(f);
+}
+
+function clearIcon() {
+  document.getElementById('f_iconFile').value = '';
+  document.getElementById('f_iconPreview').src = '';
+  document.getElementById('f_iconPreview').style.display = 'none';
+  document.getElementById('f_iconUrl').value = '';
+  document.getElementById('iconUploadStatus').textContent = '';
+}
+
+async function uploadTokenIcon(ticker, dataUrl) {
+  const r = await api('/api/admin/upload/token-icon', {
+    method: 'POST',
+    body: { ticker: ticker, dataUrl: dataUrl }
+  });
+  return r.url;
+}
+
+// 백서 업로드/미리보기
+function onWhitepaperFileChange(e) {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  if (f.size > 8 * 1024 * 1024) { toast('PDF가 8MB를 초과합니다', true); e.target.value=''; return; }
+  if (f.type !== 'application/pdf') { toast('PDF 파일만 업로드 가능합니다', true); e.target.value=''; return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    document.getElementById('f_whitepaperUrl').value = reader.result; // data URL 임시 저장
+    document.getElementById('whitepaperUploadStatus').textContent = `대기 중 (${(f.size/1024).toFixed(0)}KB · 저장 시 업로드됨)`;
+  };
+  reader.readAsDataURL(f);
+}
+
+async function uploadTokenWhitepaper(ticker, dataUrl) {
+  const r = await api('/api/admin/upload/token-whitepaper', {
+    method: 'POST',
+    body: { ticker: ticker, dataUrl: dataUrl }
+  });
+  return r.url;
+}
+
+async function startEdit(id) {
+  try {
+    const data = await api('/api/board/' + currentType);
+    const item = (data.items || []).find(x => x.id === id);
+    if (!item) return;
+    editingId = id;
+    renderForm();
+    if (currentType === 'links') {
+      document.getElementById('f_name').value = item.name || '';
+      document.getElementById('f_url').value = item.url || '';
+      document.getElementById('f_description').value = item.description || '';
+    } else if (currentType === 'tokens') {
+      document.getElementById('f_ticker').value = item.ticker || '';
+      document.getElementById('f_name').value = item.name || '';
+      document.getElementById('f_description').value = item.description || '';
+      document.getElementById('f_supply').value = item.supply || '';
+      document.getElementById('f_url').value = item.url || '';
+      // 아이콘 미리보기 (기존 URL 로드)
+      if (item.iconUrl) {
+        const preview = document.getElementById('f_iconPreview');
+        preview.src = item.iconUrl;
+        preview.style.display = 'inline-block';
+        document.getElementById('f_iconUrl').value = item.iconUrl;
+        document.getElementById('iconUploadStatus').textContent = '기존 아이콘 · 새 파일 선택 시 교체됨';
+      }
+      // 백서 URL (기존 값 로드)
+      if (item.whitepaperUrl) {
+        document.getElementById('f_whitepaperUrl').value = item.whitepaperUrl;
+        document.getElementById('whitepaperUploadStatus').textContent = '기존 백서 · 새 PDF 선택 시 교체됨';
+      }
+    } else {
+      document.getElementById('f_title').value = item.title || '';
+      document.getElementById('f_content').value = item.content || '';
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (e) { toast(e.message, true); }
+}
+
+async function saveItem() {
+  let body = {};
+  if (currentType === 'links') {
+    body.name = document.getElementById('f_name').value.trim();
+    body.url = document.getElementById('f_url').value.trim();
+    body.description = document.getElementById('f_description').value.trim();
+    if (!body.name || !body.url) { toast('사이트 이름과 URL을 입력하세요', true); return; }
+  } else if (currentType === 'tokens') {
+    body.ticker = document.getElementById('f_ticker').value.trim().toUpperCase();
+    body.name = document.getElementById('f_name').value.trim();
+    body.description = document.getElementById('f_description').value.trim();
+    body.supply = document.getElementById('f_supply').value.trim();
+    body.url = document.getElementById('f_url').value.trim();
+    if (!body.ticker || !body.name) { toast('티커와 토큰 이름은 필수입니다', true); return; }
+    // 아이콘 처리: data URL이면 서버 업로드, 이미 URL이면 그대로
+    const iconRaw = document.getElementById('f_iconUrl').value;
+    if (iconRaw && iconRaw.startsWith('data:image/')) {
+      try {
+        document.getElementById('iconUploadStatus').textContent = '업로드 중…';
+        const uploadedUrl = await uploadTokenIcon(body.ticker, iconRaw);
+        body.iconUrl = uploadedUrl;
+        document.getElementById('iconUploadStatus').textContent = '업로드 완료: ' + uploadedUrl;
+      } catch (e) {
+        toast('아이콘 업로드 실패: ' + e.message, true);
+        return;
+      }
+    } else if (iconRaw && iconRaw.startsWith('/uploads/')) {
+      body.iconUrl = iconRaw;  // 기존 URL 유지
+    } else {
+      body.iconUrl = '';  // 제거됨
+    }
+
+    // 백서 처리: data URL이면 PDF 업로드, http/uploads URL이면 그대로
+    const wpRaw = document.getElementById('f_whitepaperUrl').value.trim();
+    if (wpRaw && wpRaw.startsWith('data:application/pdf')) {
+      try {
+        document.getElementById('whitepaperUploadStatus').textContent = '백서 업로드 중…';
+        const wpUrl = await uploadTokenWhitepaper(body.ticker, wpRaw);
+        body.whitepaperUrl = wpUrl;
+        document.getElementById('whitepaperUploadStatus').textContent = '업로드 완료: ' + wpUrl;
+        document.getElementById('f_whitepaperUrl').value = wpUrl;
+      } catch (e) {
+        toast('백서 업로드 실패: ' + e.message, true);
+        return;
+      }
+    } else if (wpRaw && (wpRaw.startsWith('/uploads/') || wpRaw.startsWith('http://') || wpRaw.startsWith('https://'))) {
+      body.whitepaperUrl = wpRaw;
+    } else {
+      body.whitepaperUrl = '';
+    }
+  } else {
+    body.title = document.getElementById('f_title').value.trim();
+    body.content = document.getElementById('f_content').value.trim();
+    if (!body.title || !body.content) { toast('제목과 본문을 입력하세요', true); return; }
+  }
+
+  try {
+    if (editingId) {
+      await api('/api/board/' + currentType + '/' + editingId, { method: 'PUT', body: body });
+      toast('수정되었습니다');
+    } else {
+      await api('/api/board/' + currentType, { method: 'POST', body: body });
+      toast('등록되었습니다');
+    }
+    editingId = null;
+    renderForm();
+    loadList();
+  } catch (e) {
+    if (/401|unauthorized/i.test(e.message)) { TOKEN=''; sessionStorage.removeItem('admin_token'); showLogin(); return; }
+    toast(e.message, true);
+  }
+}
+
+async function deleteItem(id) {
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  try {
+    await api('/api/board/' + currentType + '/' + id, { method: 'DELETE' });
+    toast('삭제되었습니다');
+    loadList();
+  } catch (e) {
+    if (/401|unauthorized/i.test(e.message)) { TOKEN=''; sessionStorage.removeItem('admin_token'); showLogin(); return; }
+    toast(e.message, true);
+  }
+}
+
+async function moveItem(id, direction) {
+  try {
+    const r = await api('/api/board/' + currentType + '/' + id + '/move', { method: 'POST', body: { direction: direction } });
+    if (r && r.moved === false) { toast('더 이상 이동할 수 없습니다', true); return; }
+    loadList();
+  } catch (e) {
+    if (/401|unauthorized/i.test(e.message)) { TOKEN=''; sessionStorage.removeItem('admin_token'); showLogin(); return; }
+    toast(e.message, true);
+  }
+}
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// 초기 진입
+checkAuth();
+</script>
+
+</body>
+</html>
