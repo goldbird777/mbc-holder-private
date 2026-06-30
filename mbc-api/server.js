@@ -1286,6 +1286,7 @@ app.get('/api/whales', function(req, res) {
 //  게시판 시스템 (News / Q&A / Links)
 // ─────────────────────────────────────────────────────────
 var BOARD_DIR = '/home/ubuntu/board_data';
+var PUBLIC_BOARD_DIR = '/var/www/html/data/board';
 var BOARD_TYPES = ['news', 'qna', 'links', 'tokens'];
 
 // 어드민 비밀번호 로드
@@ -1334,8 +1335,58 @@ function saveBoard(type, data) {
     var tmp = f + '.tmp';
     fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
     fs.renameSync(tmp, f);
+    writePublicBoard(type, data);
     return true;
 }
+
+function publicBoardFile(type) {
+    if (BOARD_TYPES.indexOf(type) < 0) return null;
+    return path.join(PUBLIC_BOARD_DIR, type + '.json');
+}
+
+function publicBoardPayload(type, data) {
+    data = Array.isArray(data) ? data : [];
+    if (type === 'qna') {
+        return {
+            items: data.map(function(it) {
+                var s = sanitizeQna(it);
+                s.hasReply = !!(it.replies && it.replies.length > 0);
+                s.replyCount = it.replies ? it.replies.length : 0;
+                return s;
+            }),
+            total: data.length,
+            updatedAt: new Date().toISOString()
+        };
+    }
+    return {
+        items: data,
+        total: data.length,
+        updatedAt: new Date().toISOString()
+    };
+}
+
+function writePublicBoard(type, data) {
+    var f = publicBoardFile(type);
+    if (!f) return false;
+    try {
+        if (!fs.existsSync(PUBLIC_BOARD_DIR)) fs.mkdirSync(PUBLIC_BOARD_DIR, { recursive: true });
+        var tmp = f + '.tmp';
+        fs.writeFileSync(tmp, JSON.stringify(publicBoardPayload(type, data)));
+        fs.renameSync(tmp, f);
+        return true;
+    } catch (e) {
+        console.error('[board-cache] write failed:', type, e.message);
+        return false;
+    }
+}
+
+function refreshPublicBoards() {
+    BOARD_TYPES.forEach(function(type) {
+        writePublicBoard(type, loadBoard(type) || []);
+    });
+}
+
+refreshPublicBoards();
 
 // ── 어드민 로그인 ────────────────────────────────────────
 app.post('/api/admin/login', function(req, res) {

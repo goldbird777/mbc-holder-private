@@ -508,14 +508,35 @@ function navigate(page, fromPopstate) {
 // ── Q&A 게시판 (익명 + 비밀번호) ────────────────────────
 let qnaCurrentPage = 1;
 
+async function fetchPublicBoard(type) {
+  const res = await fetch('/data/board/' + encodeURIComponent(type) + '.json?v=' + Date.now());
+  if (!res.ok) throw new Error('static board not found');
+  return res.json();
+}
+
 async function loadQnaList(page) {
   page = page || qnaCurrentPage;
   qnaCurrentPage = page;
   const body = document.getElementById('qnaListBody');
   body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#999;">불러오는 중…</td></tr>';
   try {
-    const res = await fetch('/api/qna?page=' + page + '&perPage=15');
-    const data = await res.json();
+    const perPage = 15;
+    let data;
+    try {
+      const publicData = await fetchPublicBoard('qna');
+      const all = publicData.items || [];
+      const offset = (page - 1) * perPage;
+      data = {
+        items: all.slice(offset, offset + perPage),
+        page: page,
+        perPage: perPage,
+        total: publicData.total || all.length,
+        totalPages: Math.ceil((publicData.total || all.length) / perPage) || 1
+      };
+    } catch (staticErr) {
+      const res = await fetch('/api/qna?page=' + page + '&perPage=' + perPage);
+      data = await res.json();
+    }
     const items = data.items || [];
 
     document.getElementById('qnaTotal').textContent = (data.total || 0).toLocaleString();
@@ -937,8 +958,13 @@ async function loadBoard(type) {
   const el = document.getElementById(containerId);
   if (!el) return;
   try {
-    const res = await fetch('/api/board/' + type);
-    const data = await res.json();
+    let data;
+    try {
+      data = await fetchPublicBoard(type);
+    } catch (staticErr) {
+      const res = await fetch('/api/board/' + type);
+      data = await res.json();
+    }
     const items = data.items || [];
 
     if (items.length === 0) {
