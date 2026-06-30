@@ -1944,9 +1944,12 @@ async function downloadCSV() {
   }
 }
 
-document.getElementById('searchInput').addEventListener('keypress', e => {
-  if (e.key === 'Enter') searchAddress();
-});
+const searchInputEl = document.getElementById('searchInput');
+if (searchInputEl) {
+  searchInputEl.addEventListener('keypress', e => {
+    if (e.key === 'Enter') searchAddress();
+  });
+}
 
 window.addEventListener('DOMContentLoaded', () => {
   setLang(currentLang);
