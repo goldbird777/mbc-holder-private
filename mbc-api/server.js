@@ -63,6 +63,24 @@ function setCache(key, data) {
     addrCache[key] = { ts: Date.now(), data: data };
 }
 
+var tokenAddressInflight = {};
+function fetchTokenAddress(addr) {
+    var cacheKey = 'token:' + addr;
+    var cached = getCached(cacheKey);
+    if (cached) return Promise.resolve(cached);
+    if (tokenAddressInflight[addr]) return tokenAddressInflight[addr];
+
+    tokenAddressInflight[addr] = fetchWithRetry('https://tokens.mbc.wiki/layer/address/' + encodeURIComponent(addr), 2)
+        .then(function(data) {
+            setCache(cacheKey, data);
+            return data;
+        })
+        .finally(function() {
+            delete tokenAddressInflight[addr];
+        });
+    return tokenAddressInflight[addr];
+}
+
 // ── 재시도 래퍼 (최대 3회, 지수 백오프) ──────────────────────
 function fetchWithRetry(url, maxRetry) {
     maxRetry = maxRetry || 3;
@@ -353,12 +371,33 @@ app.get('/api/address/:addr', function(req, res) {
 // ── 토큰 잔액 ────────────────────────────────────────────────
 app.get('/api/tokens/address/:addr', function(req, res) {
     var addr = req.params.addr;
-    var cached = getCached('token:' + addr);
-    if (cached) return res.json(cached);
-
-    fetchWithRetry('https://tokens.mbc.wiki/layer/address/' + addr)
-        .then(function(data) { setCache('token:' + addr, data); res.json(data); })
+    fetchTokenAddress(addr)
+        .then(function(data) { res.json(data); })
         .catch(function(e) { res.status(500).json({ error: e.message }); });
+});
+
+app.get('/api/tokens/addresses', function(req, res) {
+    var addrs = String(req.query.addrs || '')
+        .split(',')
+        .map(function(a) { return a.trim(); })
+        .filter(function(a, i, arr) { return a && arr.indexOf(a) === i; })
+        .slice(0, 25);
+
+    if (addrs.length === 0) return res.json({ results: {} });
+
+    limitedAll(addrs, 4, function(addr) {
+        return fetchTokenAddress(addr)
+            .then(function(data) { return { addr: addr, data: data }; })
+            .catch(function(e) { return { addr: addr, data: { error: e.message, balances: [] } }; });
+    }).then(function(rows) {
+        var results = {};
+        rows.forEach(function(row) {
+            if (row && row.addr) results[row.addr] = row.data;
+        });
+        res.json({ results: results });
+    }).catch(function(e) {
+        res.status(500).json({ error: e.message });
+    });
 });
 
 // ── 토큰별 홀더 리스트 (외부 API 프록시 + 캐시) ─────────────
@@ -491,7 +530,7 @@ app.get("/api/price", function(req, res) {
 var statsCache = { ts: 0, data: null };
 
 app.get("/api/stats", function(req, res) {
-    if (statsCache.data && Date.now() - statsCache.ts < 60 * 1000) {
+    if (statsCache.data && Date.now() - statsCache.ts < 5 * 60 * 1000) {
         return res.json(statsCache.data);
     }
 
@@ -1182,13 +1221,8 @@ app.get('/api/whales', function(req, res) {
         var s = transfersDb.stats();
         // 24h count는 별도 쿼리로 추출
         try {
-            var db = require('better-sqlite3')('/home/ubuntu/transfers.db', { readonly: true });
-            db.pragma('journal_mode = WAL');
             var oneDayAgo = Math.floor(Date.now() / 1000) - 86400;
-            var poolFilter = excludePool ? ' AND is_pool = 0' : '';
-            var c24 = db.prepare('SELECT COUNT(*) AS c FROM transfers WHERE amount >= ? AND time >= ?' + poolFilter).get(threshold, oneDayAgo);
-            result.count24h = c24.c;
-            db.close();
+            result.count24h = transfersDb.countLargeSince(threshold, oneDayAgo, excludePool);
         } catch (e) { result.count24h = 0; }
         result.latestBlock = s.latestBlock || 0;
         result.threshold = threshold;

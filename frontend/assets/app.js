@@ -1578,23 +1578,29 @@ function processTokenBatch() {
     if (cell) renderTokenCell(cell, cached, item.address);
   }
   if (tokenLoadQueue.length === 0) return;
-  const batch = tokenLoadQueue.splice(0, 5);
-  Promise.all(batch.map(item =>
-    fetch('/api/tokens/address/' + item.address)
-      .then(r => r.json())
-      .then(data => {
+  const batch = tokenLoadQueue.splice(0, 10);
+  const addrs = batch.map(item => item.address).join(',');
+  fetch('/api/tokens/addresses?addrs=' + encodeURIComponent(addrs))
+    .then(r => r.json())
+    .then(payload => {
+      const results = payload.results || {};
+      batch.forEach(item => {
+        const data = results[item.address] || {};
         const balances = data.balances || [];
         setTokenCache(item.address, balances);
         const cell = document.getElementById('tcell-' + item.rowIndex);
         if (cell) renderTokenCell(cell, balances, item.address);
-      })
-      .catch(() => {
+      });
+    })
+    .catch(() => {
+      batch.forEach(item => {
         const cell = document.getElementById('tcell-' + item.rowIndex);
         if (cell) cell.innerHTML = '<span style="color:#ccc;font-size:11px;">-</span>';
-      })
-  )).finally(() => {
-    if (tokenLoadQueue.length > 0) tokenLoadTimer = setTimeout(processTokenBatch, 300);
-  });
+      });
+    })
+    .finally(() => {
+      if (tokenLoadQueue.length > 0) tokenLoadTimer = setTimeout(processTokenBatch, 500);
+    });
 }
 
 function renderPagination(current, total) {
