@@ -34,12 +34,6 @@ function init() {
         CREATE INDEX IF NOT EXISTS idx_time_desc ON transfers(time DESC);
         CREATE INDEX IF NOT EXISTS idx_from ON transfers(from_addr);
         CREATE INDEX IF NOT EXISTS idx_to ON transfers(to_addr);
-        CREATE INDEX IF NOT EXISTS idx_amount_time ON transfers(amount, time DESC);
-        CREATE INDEX IF NOT EXISTS idx_pool_amount_time ON transfers(is_pool, amount, time DESC);
-        CREATE INDEX IF NOT EXISTS idx_block_amount_pool ON transfers(block DESC, amount, is_pool);
-        CREATE INDEX IF NOT EXISTS idx_from_block ON transfers(from_addr, block DESC);
-        CREATE INDEX IF NOT EXISTS idx_to_block ON transfers(to_addr, block DESC);
-
         CREATE TABLE IF NOT EXISTS scan_progress (
             key TEXT PRIMARY KEY,
             value INTEGER NOT NULL
