@@ -87,7 +87,7 @@ function fetchWithRetry(url, maxRetry) {
     return new Promise(function(resolve, reject) {
         var attempt = 0;
         function run() {
-            fetch(url)
+            fetch(url, { timeout: 7000 })
                 .then(function(r) {
                     if (!r.ok) throw new Error('HTTP ' + r.status);
                     return r.json();
