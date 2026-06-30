@@ -81,6 +81,45 @@ function fetchTokenAddress(addr) {
     return tokenAddressInflight[addr];
 }
 
+function extractInputAddress(txResp) {
+    var tx = txResp && (txResp.result || txResp);
+    var vins = (tx && tx.vin) || [];
+    for (var i = 0; i < vins.length; i++) {
+        var vin = vins[i];
+        if (!vin || vin.coinbase) continue;
+        var spk = vin.scriptPubKey || {};
+        var addr = spk.address || (spk.addresses && spk.addresses[0]) ||
+            vin.address || (vin.addresses && vin.addresses[0]) || null;
+        if (addr) return addr;
+    }
+    return null;
+}
+
+function fillMissingFromAddresses(items) {
+    var missing = (items || []).filter(function(t) { return t && !t.from && t.txid; });
+    if (missing.length === 0) return Promise.resolve(items);
+
+    return limitedAll(missing.slice(0, 10), 3, function(t) {
+        var cacheKey = 'tx-from:' + t.txid;
+        var cached = getCached(cacheKey);
+        if (cached) {
+            t.from = cached.from || null;
+            return Promise.resolve(t);
+        }
+
+        return fetchWithRetry('https://api.mbc.wiki/transaction/' + encodeURIComponent(t.txid), 2)
+            .then(function(tx) {
+                var from = extractInputAddress(tx);
+                if (from) t.from = from;
+                setCache(cacheKey, { from: t.from || null });
+                return t;
+            })
+            .catch(function() { return t; });
+    }).then(function() {
+        return items;
+    });
+}
+
 // ── 재시도 래퍼 (최대 3회, 지수 백오프) ──────────────────────
 function fetchWithRetry(url, maxRetry) {
     maxRetry = maxRetry || 3;
@@ -1217,6 +1256,7 @@ app.get('/api/whales', function(req, res) {
             excludeDust: true,
             dustThreshold: threshold
         });
+        return fillMissingFromAddresses(result.items).then(function() {
         // 24시간 신규 (전체 카운트)
         var s = transfersDb.stats();
         // 24h count는 별도 쿼리로 추출
@@ -1234,6 +1274,9 @@ app.get('/api/whales', function(req, res) {
             wkeys.forEach(function(k) { if (now - whaleCache[k].ts > WHALE_TTL) delete whaleCache[k]; });
         }
         res.json(result);
+        }).catch(function() {
+            res.json(result);
+        });
     } catch (e) {
         res.status(500).json({ error: e.message || String(e) });
     }
