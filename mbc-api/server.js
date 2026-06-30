@@ -120,6 +120,12 @@ function fillMissingFromAddresses(items) {
     });
 }
 
+function removeSelfTransfers(items) {
+    return (items || []).filter(function(t) {
+        return !(t && t.from && t.to && t.from === t.to);
+    });
+}
+
 // ── 재시도 래퍼 (최대 3회, 지수 백오프) ──────────────────────
 function fetchWithRetry(url, maxRetry) {
     maxRetry = maxRetry || 3;
@@ -1264,7 +1270,8 @@ app.get('/api/whales', function(req, res) {
             var oneDayAgo = Math.floor(Date.now() / 1000) - 86400;
             result.count24h = transfersDb.countLargeSince(threshold, oneDayAgo, excludePool);
         } catch (e) { result.count24h = 0; }
-        result.latestBlock = s.latestBlock || 0;
+            result.items = removeSelfTransfers(result.items);
+            result.latestBlock = s.latestBlock || 0;
         result.threshold = threshold;
         whaleCache[key] = { ts: Date.now(), data: result };
         // 캐시 항목 너무 많이 쌓이지 않게 정리
