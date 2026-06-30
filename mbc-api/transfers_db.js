@@ -165,13 +165,25 @@ function listTransfers(opts) {
     const total = totalRow.c;
     const totalPages = Math.ceil(total / perPage);
 
-    const rows = db.prepare(`
-        SELECT txid, block, time, from_addr, to_addr, amount, is_pool
-        FROM transfers
-        WHERE ${where}
-        ORDER BY block DESC, txid
-        LIMIT @perPage OFFSET @offset
-    `).all(Object.assign({}, params, { perPage: perPage, offset: offset }));
+    let rows;
+    const reverseOffset = Math.max(0, total - offset - perPage);
+    if (reverseOffset < offset) {
+        rows = db.prepare(`
+            SELECT txid, block, time, from_addr, to_addr, amount, is_pool
+            FROM transfers
+            WHERE ${where}
+            ORDER BY block ASC, txid DESC
+            LIMIT @perPage OFFSET @reverseOffset
+        `).all(Object.assign({}, params, { perPage: perPage, reverseOffset: reverseOffset })).reverse();
+    } else {
+        rows = db.prepare(`
+            SELECT txid, block, time, from_addr, to_addr, amount, is_pool
+            FROM transfers
+            WHERE ${where}
+            ORDER BY block DESC, txid
+            LIMIT @perPage OFFSET @offset
+        `).all(Object.assign({}, params, { perPage: perPage, offset: offset }));
+    }
 
     return {
         total: total,
