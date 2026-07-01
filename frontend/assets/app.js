@@ -608,6 +608,7 @@ function openQnaWriteModal(editing) {
         <input type="text" id="qnaModalAuthor" placeholder="익명" style="width:100%; padding:10px 12px; background:var(--bg-soft); border:1.5px solid var(--border); border-radius:6px; font-size:13px; margin:4px 0 10px; outline:none;" value="${editing ? String(editing.author || '').replace(/"/g,'&quot;') : ''}">
         <label style="font-size:11px; color:var(--text-sub); font-weight:700;">비밀번호 (최소 4자) ${isEdit ? '— 본인 확인용' : ''}</label>
         <input type="password" id="qnaModalPassword" placeholder="${isEdit ? '글 작성 시 사용한 비밀번호' : '본인 글 수정·삭제 시 필요'}" style="width:100%; padding:10px 12px; background:var(--bg-soft); border:1.5px solid var(--border); border-radius:6px; font-size:13px; margin:4px 0 14px; outline:none;">
+        ${!isEdit ? '<label style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text-sub); font-weight:700; margin:-4px 0 12px; cursor:pointer;"><input type="checkbox" id="qnaModalPrivate" style="width:16px; height:16px;"> 관리자만 보기</label>' : ''}
         <div id="qnaModalError" style="color:var(--red); font-size:12px; margin-bottom:10px; min-height:16px;"></div>
         <div style="display:flex; gap:8px; justify-content:flex-end;">
           <button onclick="closeQnaModal()" style="padding:10px 20px; background:#fff; color:var(--text-sub); border:1.5px solid var(--border); border-radius:6px; font-weight:700; cursor:pointer;">취소</button>
@@ -629,6 +630,7 @@ async function submitQnaWrite() {
   const content = document.getElementById('qnaModalContent').value.trim();
   const author = document.getElementById('qnaModalAuthor').value.trim();
   const password = document.getElementById('qnaModalPassword').value;
+  const isPrivate = !!(document.getElementById('qnaModalPrivate') && document.getElementById('qnaModalPrivate').checked);
   const err = document.getElementById('qnaModalError');
   err.textContent = '';
   if (!title || !content) { err.textContent = '제목과 본문을 입력하세요'; return; }
@@ -637,7 +639,7 @@ async function submitQnaWrite() {
     const res = await fetch('/api/qna', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, content, author: author || '익명', password })
+      body: JSON.stringify({ title, content, author: author || '익명', password, isPrivate })
     });
     const data = await res.json();
     if (!res.ok) { err.textContent = data.error || '등록 실패'; return; }

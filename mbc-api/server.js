@@ -777,6 +777,10 @@ function sanitizeQna(item) {
     return copy;
 }
 
+function publicQnaItems(data) {
+    return (Array.isArray(data) ? data : []).filter(function(it) { return !it.isPrivate; });
+}
+
 // 목록 조회 (페이지네이션)
 app.get('/api/qna', function(req, res) {
     var page = Math.max(1, parseInt(req.query.page) || 1);
@@ -787,6 +791,7 @@ app.get('/api/qna', function(req, res) {
         try { return JSON.parse(fs.readFileSync(f, 'utf8')); }
         catch (e) { return []; }
     })();
+    if (!isAdmin(req)) data = publicQnaItems(data);
     var total = data.length;
     var totalPages = Math.ceil(total / perPage);
     var offset = (page - 1) * perPage;
@@ -811,6 +816,7 @@ app.get('/api/qna/:id', function(req, res) {
     var data = loadBoard('qna') || [];
     var idx = data.findIndex(function(x) { return x.id === req.params.id; });
     if (idx < 0) return res.status(404).json({ error: 'not found' });
+    if (data[idx].isPrivate && !isAdmin(req)) return res.status(404).json({ error: 'not found' });
     // 조회수 +1
     data[idx].viewCount = (data[idx].viewCount || 0) + 1;
     saveBoard('qna', data);
@@ -824,6 +830,7 @@ app.post('/api/qna', function(req, res) {
     var content = (body.content || '').toString().trim().slice(0, 20000);
     var author = (body.author || '익명').toString().trim().slice(0, 30) || '익명';
     var password = (body.password || '').toString();
+    var isPrivate = body.isPrivate === true || body.isPrivate === 'true' || body.private === true || body.private === 'true';
     if (!title || !content) return res.status(400).json({ error: '제목과 본문을 입력하세요' });
     if (!password || password.length < 4) return res.status(400).json({ error: '비밀번호는 최소 4자 이상' });
 
@@ -833,6 +840,7 @@ app.post('/api/qna', function(req, res) {
         title: title,
         content: content,
         author: author,
+        isPrivate: isPrivate,
         passwordHash: hashPassword(password),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -861,6 +869,7 @@ app.put('/api/qna/:id', function(req, res) {
     if (body.title != null) item.title = body.title.toString().trim().slice(0, 200);
     if (body.content != null) item.content = body.content.toString().trim().slice(0, 20000);
     if (body.author != null) item.author = body.author.toString().trim().slice(0, 30);
+    if (body.isPrivate != null) item.isPrivate = body.isPrivate === true || body.isPrivate === 'true';
     item.updatedAt = new Date().toISOString();
     data[idx] = item;
     saveBoard('qna', data);
@@ -1348,14 +1357,15 @@ function publicBoardFile(type) {
 function publicBoardPayload(type, data) {
     data = Array.isArray(data) ? data : [];
     if (type === 'qna') {
+        var visible = publicQnaItems(data);
         return {
-            items: data.map(function(it) {
+            items: visible.map(function(it) {
                 var s = sanitizeQna(it);
                 s.hasReply = !!(it.replies && it.replies.length > 0);
                 s.replyCount = it.replies ? it.replies.length : 0;
                 return s;
             }),
-            total: data.length,
+            total: visible.length,
             updatedAt: new Date().toISOString()
         };
     }

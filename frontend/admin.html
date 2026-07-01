@@ -601,7 +601,7 @@ async function loadList() {
       else if (currentType === 'tokens') { title = (it.ticker || '?') + ' · ' + (it.name || ''); sub = it.supply ? '최대 발행: ' + it.supply : ''; content = it.description; }
       else if (currentType === 'qna') {
         title = it.title;
-        sub = '작성자: ' + (it.author || '익명') + (it.hasReply ? ' · 답변완료' : ' · 답변대기');
+        sub = (it.isPrivate ? '관리자만 보기 · ' : '') + '작성자: ' + (it.author || '익명') + (it.hasReply ? ' · 답변완료' : ' · 답변대기');
         content = it.content;
       }
       else { title = it.title; sub = ''; content = it.content; }
