@@ -9,8 +9,10 @@ const RPC_CONFIG = {
 };
 
 const HOLDERS_FILE = '/home/ubuntu/mbc_holders_final.json';
-const POLL_INTERVAL = 30000;
-const CHECKPOINT_INTERVAL = 100;
+const POLL_INTERVAL = parseInt(process.env.SCAN_POLL_INTERVAL_MS || '120000', 10);
+const CHECKPOINT_INTERVAL = parseInt(process.env.SCAN_CHECKPOINT_BLOCKS || '25', 10);
+const MAX_BLOCKS_PER_CYCLE = parseInt(process.env.SCAN_MAX_BLOCKS_PER_CYCLE || '25', 10);
+const BLOCK_DELAY_MS = parseInt(process.env.SCAN_BLOCK_DELAY_MS || '100', 10);
 
 // transfers DB 초기화 (모듈 로드 시 한 번)
 transfersDb.open();
@@ -159,14 +161,16 @@ async function scan() {
     return { newBlocks: 0, currentHeight: currentHeight };
   }
 
-  const total = currentHeight - startBlock + 1;
-  console.log(`[${new Date().toLocaleTimeString('ko-KR')}] Scanning ${total} new blocks (${startBlock} → ${currentHeight})...`);
+  const targetHeight = Math.min(currentHeight, startBlock + MAX_BLOCKS_PER_CYCLE - 1);
+  const total = targetHeight - startBlock + 1;
+  const backlog = currentHeight - targetHeight;
+  console.log(`[${new Date().toLocaleTimeString('ko-KR')}] Scanning ${total} new blocks (${startBlock} -> ${targetHeight}, backlog ${backlog})...`);
 
   let processed = 0;
   let lastSavedBlock = startBlock - 1;
   const startTime = Date.now();
 
-  for (let h = startBlock; h <= currentHeight; h++) {
+  for (let h = startBlock; h <= targetHeight; h++) {
     try {
       const blockHash = await rpc('getblockhash', [h]);
       const block = await rpc('getblock', [blockHash, 2]);
@@ -220,24 +224,26 @@ async function scan() {
         const eta = remain / rate;
         console.log(`[${new Date().toLocaleTimeString('ko-KR')}] Checkpoint: ${processed}/${total} blocks (block ${h}, holders ${cnt.toLocaleString()}, ${rate.toFixed(1)} blk/s, ETA ${Math.ceil(eta)}s)`);
       }
+      if (BLOCK_DELAY_MS > 0) await new Promise(r => setTimeout(r, BLOCK_DELAY_MS));
     } catch(e) {
       console.error(`Block ${h} error:`, e.message);
     }
   }
 
-  if (lastSavedBlock < currentHeight) {
-    const cnt = saveHolders(balances, currentHeight);
+  if (lastSavedBlock < targetHeight) {
+    const cnt = saveHolders(balances, targetHeight);
     const duration = ((Date.now() - startTime) / 1000).toFixed(0);
-    console.log(`[${new Date().toLocaleTimeString('ko-KR')}] ✓ Scanned ${processed} blocks in ${duration}s. Holders: ${cnt.toLocaleString()}, Block: ${currentHeight.toLocaleString()}`);
+    console.log(`[${new Date().toLocaleTimeString('ko-KR')}] Scanned ${processed} blocks in ${duration}s. Holders: ${cnt.toLocaleString()}, Block: ${targetHeight.toLocaleString()}, remaining: ${(currentHeight - targetHeight).toLocaleString()}`);
   }
 
-  return { newBlocks: processed, currentHeight: currentHeight };
+  return { newBlocks: processed, currentHeight: currentHeight, lastScannedBlock: targetHeight, remainingBlocks: currentHeight - targetHeight };
 }
 
 async function runLoop() {
   console.log('=== Realtime UTXO Scan Started ===');
-  console.log('Poll interval: 30 seconds');
+  console.log('Poll interval: ' + Math.round(POLL_INTERVAL / 1000) + ' seconds');
   console.log('Checkpoint interval: ' + CHECKPOINT_INTERVAL + ' blocks');
+  console.log('Max blocks per cycle: ' + MAX_BLOCKS_PER_CYCLE);
   console.log('Time:', new Date().toLocaleString('ko-KR'));
   console.log('');
 
@@ -246,7 +252,9 @@ async function runLoop() {
       const result = await scan();
 
       if (result.newBlocks === 0) {
-        console.log(`[${new Date().toLocaleTimeString('ko-KR')}] Up to date (block ${result.currentHeight.toLocaleString()}). Waiting 30s...`);
+        console.log(`[${new Date().toLocaleTimeString('ko-KR')}] Up to date (block ${result.currentHeight.toLocaleString()}). Waiting ${Math.round(POLL_INTERVAL / 1000)}s...`);
+      } else if (result.remainingBlocks > 0) {
+        console.log(`[${new Date().toLocaleTimeString('ko-KR')}] Cycle complete. Remaining ${result.remainingBlocks.toLocaleString()} blocks. Waiting ${Math.round(POLL_INTERVAL / 1000)}s...`);
       }
     } catch(e) {
       console.error(`[${new Date().toLocaleTimeString('ko-KR')}] Error:`, e.message || e);
