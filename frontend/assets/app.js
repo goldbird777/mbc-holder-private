@@ -9,7 +9,7 @@ const i18n = {
     ad_top: "상단 가로 배너 (970×90 또는 자동 반응형)",
     ad_right: "우측 세로 광고<br>(160×600 또는 반응형)<br><br>스크롤해도<br>항상 보임",
 
-    menu_explore: "탐색",
+    menu_explore: "탐색 및 통계",
     menu_holders: "홀더 리스트",
     menu_search: "주소 검색",
     menu_stats_label: "통계",
@@ -169,7 +169,7 @@ const i18n = {
     ad_top: "Top Banner Ad (970×90 or Auto Responsive)",
     ad_right: "Vertical Ad<br>(160×600 or Responsive)<br><br>Sticky on scroll",
 
-    menu_explore: "EXPLORE",
+    menu_explore: "EXPLORE & STATS",
     menu_holders: "Holder List",
     menu_search: "Address Search",
     menu_stats_label: "STATS",

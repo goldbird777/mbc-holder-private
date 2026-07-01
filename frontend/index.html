@@ -62,7 +62,7 @@
     <span class="toggle-icon" id="toggleIcon">◀</span>
   </div>
   <div class="menu-section">
-    <div class="menu-label" data-i18n="menu_explore">탐색</div>
+    <div class="menu-label" data-i18n="menu_explore">탐색 및 통계</div>
     <a class="menu-item active" data-page="holders" onclick="navigate('holders'); return false;">
       <span class="m-icon">📋</span>
       <span class="m-text" data-i18n="menu_holders">홀더 리스트</span>
@@ -75,16 +75,9 @@
       <span class="m-icon">🐳</span>
       <span class="m-text">Whale Alert</span>
     </a>
-  </div>
-  <div class="menu-section">
-    <div class="menu-label" data-i18n="menu_stats_label">통계</div>
     <a class="menu-item" data-page="stats" onclick="navigate('stats'); return false;">
       <span class="m-icon">📊</span>
       <span class="m-text" data-i18n="menu_stats">전체 통계</span>
-    </a>
-    <a class="menu-item" href="https://miningpoolstats.stream/microbitcoin" target="_blank" rel="noopener">
-      <span class="m-icon">⚡</span>
-      <span class="m-text" data-i18n="menu_hashrate">해시레이트 ↗</span>
     </a>
   </div>
   <div class="menu-section">
@@ -130,6 +123,10 @@
     <a class="menu-item" href="https://github.com/MicroBitcoinOrg" target="_blank" rel="noopener">
       <svg class="m-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" style="flex-shrink:0;"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
       <span class="m-text">GitHub ↗</span>
+    </a>
+    <a class="menu-item" href="https://miningpoolstats.stream/microbitcoin" target="_blank" rel="noopener">
+      <span class="m-icon">⚡</span>
+      <span class="m-text" data-i18n="menu_hashrate">해시레이트 ↗</span>
     </a>
     <a class="menu-item" data-page="links" onclick="navigate('links'); return false;">
       <span class="m-icon">🔗</span>
@@ -258,6 +255,10 @@
     <section class="page-section active" id="page-holders">
       <div class="page-title">📋 <span data-i18n="page_holders_title">홀더 리스트</span></div>
       <div class="page-subtitle" data-i18n="page_holders_sub">MicroBitcoin 네트워크의 전체 활성 홀더를 잔액 기준으로 표시합니다</div>
+
+      <div class="help-tip">
+        MicroBitcoin 홀더 리스트는 공개 블록체인 데이터를 기반으로 활성 지갑 주소, 보유 잔액, 점유율, 레이어2 토큰 보유 현황을 정리합니다. 특정 주소를 클릭하면 해당 지갑의 송수신 내역과 토큰 정보를 함께 확인할 수 있으며, 모든 데이터는 정보 제공 목적입니다.
+      </div>
 
       <div class="summary-grid">
         <div class="s-card navy">
@@ -519,6 +520,10 @@
       <div class="page-title">📊 <span data-i18n="page_stats_title">전체 통계</span></div>
       <div class="page-subtitle" data-i18n="page_stats_sub">MicroBitcoin 네트워크 현황 한눈에 보기</div>
 
+      <div class="help-tip">
+        전체 통계는 현재 블록, 홀더 수, 공급량, 네트워크 상태, 채굴 난이도 등 MicroBitcoin 네트워크의 핵심 지표를 한 화면에 모아 보여줍니다. 수치는 자체 노드와 캐시된 API 데이터를 조합해 표시되며, 일시적인 동기화 지연이 있을 수 있습니다.
+      </div>
+
       <!-- 반감기 카운트다운 -->
       <div style="background:linear-gradient(135deg, var(--mbc-navy), var(--mbc-navy-light)); color:#fff; border-radius:14px; padding:24px 28px; margin-bottom:22px; box-shadow:0 4px 16px rgba(22,0,92,.2);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
@@ -623,6 +628,10 @@
     <section class="page-section" id="page-mining">
       <div class="page-title">⛏️ <span data-i18n="page_mining_title">채굴 방법 소개</span></div>
       <div class="page-subtitle" data-i18n="page_mining_sub">MBC를 직접 채굴해보고 싶은 분들을 위한 입문 가이드</div>
+
+      <div class="help-tip">
+        채굴 방법 소개는 MicroBitcoin의 CPU 친화 채굴 구조, 지갑 준비, 풀 선택, 채굴 프로그램 설정, 예상 수익 계산을 초보자 기준으로 정리한 안내 페이지입니다. 실제 수익은 장비 성능, 전기요금, 난이도, 시세에 따라 달라질 수 있습니다.
+      </div>
 
       <div class="static-card">
         <h2 data-i18n="mining_intro_title">MBC 채굴이 특별한 이유</h2>
@@ -769,7 +778,7 @@
       <div class="page-subtitle">MicroBitcoin 관련 공지·업데이트·이벤트 소식</div>
 
       <div class="help-tip">
-        💡 운영자가 직접 등록한 공식 소식만 표시됩니다. 글쓰기는 어드민 페이지에서만 가능합니다.
+        최근 소식은 MicroBitcoin 생태계와 이 탐색기 운영에 관련된 공지, 업데이트, 이벤트, 서비스 변경 사항을 정리하는 게시판입니다. 운영자가 확인한 내용만 게시하며, 방문자는 변경 내역과 중요한 안내를 한곳에서 확인할 수 있습니다.
       </div>
 
       <div id="newsList" style="display:flex; flex-direction:column; gap:14px;">
@@ -783,7 +792,7 @@
       <div class="page-subtitle">누구나 익명으로 질문하고 운영자가 답변합니다 · 비밀번호 4자리로 본인 글 관리</div>
 
       <div class="help-tip">
-        💡 비밀번호는 본인이 작성한 글을 수정·삭제할 때 필요합니다. <strong>잊지 마세요!</strong> (서버에는 hash로만 저장되어 복구 불가능)
+        Q&amp;A 게시판은 지갑 생성, 채굴, 거래 조회, 토큰 확인, 사이트 이용 중 생기는 질문을 남기고 답변을 확인하는 공간입니다. 작성 시 입력한 비밀번호는 본인 글 수정·삭제에 필요하며, 서버에는 해시 형태로만 저장되어 복구할 수 없습니다.
       </div>
 
       <div class="controls-bar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
@@ -840,6 +849,10 @@
       <div class="page-title">🔗 <span>관련 사이트</span></div>
       <div class="page-subtitle">MicroBitcoin 관련 공식·커뮤니티 사이트 모음</div>
 
+      <div class="help-tip">
+        관련 사이트는 MicroBitcoin 공식 홈페이지, GitHub, 커뮤니티, 지갑, 채굴풀, 외부 탐색기처럼 이용자가 자주 찾는 외부 자료를 모아 둔 링크 모음입니다. 외부 사이트의 운영 정책과 정보 정확성은 각 사이트의 기준을 따릅니다.
+      </div>
+
       <div id="linksList" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:14px;">
         <div style="text-align:center; padding:30px; color:#999; grid-column:1/-1;">불러오는 중…</div>
       </div>
@@ -851,7 +864,7 @@
       <div class="page-subtitle">MicroBitcoin Layer2 토큰 목록 · 운영자가 직접 등록한 공식 토큰만 표시</div>
 
       <div class="help-tip">
-        💡 토큰 카드를 클릭하면 해당 토큰의 홀더 리스트(상위 보유자)를 볼 수 있습니다. 새 토큰 추가는 관리자 페이지에서 진행합니다.
+        MBC 레이어2 토큰 일람은 MicroBitcoin 네트워크 위에서 발행된 토큰의 기본 정보와 보유자 현황을 확인하는 페이지입니다. 토큰 카드를 클릭하면 해당 토큰의 상위 보유자 목록을 볼 수 있으며, 등록 정보는 운영자가 확인한 항목을 기준으로 표시됩니다.
       </div>
 
       <div id="tokensList" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
@@ -911,6 +924,10 @@
     <section class="page-section" id="page-wonpay">
       <div class="page-title">👛 <span data-i18n="page_wonpay_title">Wonpay 지갑</span></div>
       <div class="page-subtitle" data-i18n="page_wonpay_sub">MicroBitcoin 공식 모바일 지갑 · Android / iOS 지원</div>
+
+      <div class="help-tip">
+        Wonpay 지갑 페이지는 MicroBitcoin을 보관하고 송수신하는 모바일 지갑 설치 방법, 주요 기능, 복구 시 주의사항을 안내합니다. 지갑 생성 후에는 복구 문구와 개인키를 본인이 직접 안전하게 보관해야 하며, 분실 시 복구가 어려울 수 있습니다.
+      </div>
 
       <div class="static-card">
         <h2>📱 Wonpay 모바일 지갑이란?</h2>
@@ -990,6 +1007,10 @@
     <section class="page-section" id="page-exchanges">
       <div class="page-title">💱 <span data-i18n="page_exchanges_title">상장 거래소</span></div>
       <div class="page-subtitle" data-i18n="page_exchanges_sub">MBC를 거래할 수 있는 암호화폐 거래소 목록</div>
+
+      <div class="help-tip">
+        상장 거래소 페이지는 MicroBitcoin 거래가 가능한 외부 거래소와 기본 이용 정보를 모아 둔 안내 페이지입니다. 거래소별 입출금 상태, 수수료, 거래량은 수시로 바뀔 수 있으므로 실제 거래 전 공식 사이트에서 최종 확인이 필요합니다.
+      </div>
 
       <div class="warn-box" style="background:#FFF8E1; border-left:4px solid #FFA000; padding:12px 16px; border-radius:6px; font-size:12px; color:#6D4C00; margin-bottom:18px; line-height:1.6;">
         ⚠️ <span data-i18n="exchanges_warn">아래 거래소 정보는 참고용이며 거래소의 운영 상태·거래량·수수료는 수시로 변경됩니다. 거래 전 반드시 공식 사이트에서 직접 확인하시고, 본인의 책임 하에 거래하세요.</span>
@@ -1331,6 +1352,6 @@
 
 
 
-  <script src="/assets/app.js?v=7" defer></script>
+  <script src="/assets/app.js?v=8" defer></script>
 </body>
 </html>
