@@ -714,6 +714,7 @@ app.get('/api/mining-info', function(req, res) {
 var recentCache = { ts: 0, data: { transfers: [], blockHeight: 0, updatedAt: null, loading: true } };
 var RECENT_SCAN_BLOCKS = 5;
 var RECENT_MAX = 50;
+var recentRefreshInFlight = false;
 
 function pickAddr(spk) {
     if (!spk) return null;
@@ -785,12 +786,16 @@ async function buildRecentTransfers() {
 }
 
 async function refreshRecentTransfers() {
+    if (recentRefreshInFlight) return;
+    recentRefreshInFlight = true;
     try {
         var data = await buildRecentTransfers();
         recentCache = { ts: Date.now(), data: data };
         console.log('[recent-transfers] cached ' + data.transfers.length + ' transfers @ block ' + data.blockHeight);
     } catch (e) {
         console.error('[recent-transfers] refresh failed:', e.message || e);
+    } finally {
+        recentRefreshInFlight = false;
     }
 }
 
