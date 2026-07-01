@@ -597,7 +597,7 @@ function renderQnaPagination(totalPages, currentPage) {
 function openQnaWriteModal(editing) {
   const isEdit = !!editing;
   const html = `
-    <div id="qnaModalBackdrop" style="position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:9999; display:flex; align-items:center; justify-content:center; padding:14px;" onclick="if(event.target===this) closeQnaModal()">
+    <div id="qnaModalBackdrop" style="position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:9999; display:flex; align-items:center; justify-content:center; padding:14px;">
       <div style="background:#fff; border-radius:12px; padding:24px; max-width:560px; width:100%; max-height:90vh; overflow-y:auto;">
         <h2 style="font-size:18px; color:var(--mbc-navy); margin-bottom:14px;">${isEdit ? '글 수정' : '✍ 새 글 작성'}</h2>
         <label style="font-size:11px; color:var(--text-sub); font-weight:700;">제목</label>
@@ -607,7 +607,7 @@ function openQnaWriteModal(editing) {
         <label style="font-size:11px; color:var(--text-sub); font-weight:700;">작성자 (선택)</label>
         <input type="text" id="qnaModalAuthor" placeholder="익명" style="width:100%; padding:10px 12px; background:var(--bg-soft); border:1.5px solid var(--border); border-radius:6px; font-size:13px; margin:4px 0 10px; outline:none;" value="${editing ? String(editing.author || '').replace(/"/g,'&quot;') : ''}">
         <label style="font-size:11px; color:var(--text-sub); font-weight:700;">비밀번호 (최소 4자) ${isEdit ? '— 본인 확인용' : ''}</label>
-        <input type="password" id="qnaModalPassword" placeholder="${isEdit ? '글 작성 시 사용한 비밀번호' : '본인 글 수정·삭제 시 필요'}" style="width:100%; padding:10px 12px; background:var(--bg-soft); border:1.5px solid var(--border); border-radius:6px; font-size:13px; margin:4px 0 14px; outline:none;">
+        <input type="password" id="qnaModalPassword" autocomplete="new-password" name="qna_post_password" placeholder="${isEdit ? '글 작성 시 사용한 비밀번호' : '본인 글 수정·삭제 시 필요'}" style="width:100%; padding:10px 12px; background:var(--bg-soft); border:1.5px solid var(--border); border-radius:6px; font-size:13px; margin:4px 0 14px; outline:none;">
         ${!isEdit ? '<label style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text-sub); font-weight:700; margin:-4px 0 12px; cursor:pointer;"><input type="checkbox" id="qnaModalPrivate" style="width:16px; height:16px;"> 관리자만 보기</label>' : ''}
         <div id="qnaModalError" style="color:var(--red); font-size:12px; margin-bottom:10px; min-height:16px;"></div>
         <div style="display:flex; gap:8px; justify-content:flex-end;">
@@ -643,8 +643,13 @@ async function submitQnaWrite() {
     });
     const data = await res.json();
     if (!res.ok) { err.textContent = data.error || '등록 실패'; return; }
-    closeQnaModal();
-    alert(isPrivate ? '관리자만 볼 수 있는 글로 등록되었습니다.' : '등록되었습니다.');
+    if (isPrivate) {
+      err.style.color = 'var(--green)';
+      err.textContent = '관리자만 볼 수 있는 글로 등록되었습니다. 공개 목록에는 표시되지 않습니다.';
+      setTimeout(closeQnaModal, 900);
+    } else {
+      closeQnaModal();
+    }
     loadQnaList(1);
   } catch (e) { err.textContent = '오류: ' + e.message; }
 }
