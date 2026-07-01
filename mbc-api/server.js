@@ -226,6 +226,41 @@ app.get('/api/holders', function(req, res) {
     }
 });
 
+app.get('/api/holder/:addr', function(req, res) {
+    try {
+        var addr = req.params.addr;
+        var cache = getHoldersData();
+        var holders = cache.parsed.holders || [];
+        var idx = -1;
+        for (var i = 0; i < holders.length; i++) {
+            if (holders[i].address === addr) { idx = i; break; }
+        }
+        if (idx < 0) {
+            return res.json({
+                address: addr,
+                found: false,
+                balance: 0,
+                rank: null,
+                percent: 0,
+                totalSupply: cache.totalSupply,
+                blockHeight: cache.parsed.blockHeight || 0
+            });
+        }
+        var h = holders[idx];
+        res.json({
+            address: addr,
+            found: true,
+            balance: h.balance || 0,
+            rank: idx + 1,
+            percent: cache.totalSupply ? ((h.balance || 0) / cache.totalSupply * 100) : 0,
+            totalSupply: cache.totalSupply,
+            blockHeight: cache.parsed.blockHeight || 0
+        });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
 // ── 주소 거래 내역 ────────────────────────────────────────────
 app.get('/api/address/:addr', function(req, res) {
     var addr = req.params.addr;

@@ -1766,8 +1766,29 @@ function showDetail(address, defaultTab, fromPopstate) {
   document.getElementById('tokensContainer').innerHTML = '로딩 중…';
 
   switchTab(defaultTab || 'mbc');
+  loadHolderSummary(address);
   loadAddressTransactions(address);
   loadAddressTokens(address);
+}
+
+function loadHolderSummary(address) {
+  fetch('/api/holder/' + encodeURIComponent(address))
+    .then(r => r.json())
+    .then(h => {
+      if (currentDetailAddr !== address || !h) return;
+      if (h.found) {
+        document.getElementById('detailBalance').textContent = fmt((h.balance || 0) / 1e8);
+        document.getElementById('detailRank').textContent = '#' + (h.rank || '-');
+        document.getElementById('detailPercent').textContent = ((h.percent || 0).toFixed(4)) + '%';
+        const oldBadge = document.getElementById('inactiveBadge');
+        if (oldBadge) oldBadge.remove();
+      } else {
+        document.getElementById('detailBalance').textContent = '0';
+        document.getElementById('detailRank').textContent = '비활성';
+        document.getElementById('detailPercent').textContent = '0.0000%';
+      }
+    })
+    .catch(() => {});
 }
 
 function switchTab(name) {
