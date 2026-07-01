@@ -122,6 +122,7 @@
     <div class="tab" data-type="qna" onclick="switchType('qna')">❓ Q&amp;A</div>
     <div class="tab" data-type="lab" onclick="switchType('lab')">🧪 랩 노트</div>
     <div class="tab" data-type="links" onclick="switchType('links')">🔗 관련 사이트</div>
+    <div class="tab" data-type="exchanges" onclick="switchType('exchanges')">💱 상장 거래소</div>
     <div class="tab" data-type="tokens" onclick="switchType('tokens')">🪙 MBC2 토큰</div>
     <div class="tab" data-type="pools" onclick="switchType('pools')">🏊 채굴풀 주소</div>
     <div class="tab" data-type="donate" onclick="switchType('donate')">☕ 후원 주소</div>
@@ -533,6 +534,25 @@ function renderForm() {
       <input type="text" id="f_url" placeholder="https://...">
       <label>설명 (선택)</label>
       <input type="text" id="f_description" placeholder="간단한 설명">
+      <label>대표 이미지 URL (선택)</label>
+      <input type="text" id="f_imageUrl" placeholder="https://...">
+    `;
+  } else if (currentType === 'exchanges') {
+    fc.innerHTML = `
+      <label>거래소 이름</label>
+      <input type="text" id="f_name" placeholder="예: LBank">
+      <label>URL</label>
+      <input type="text" id="f_url" placeholder="https://...">
+      <label>거래 페어 (선택)</label>
+      <input type="text" id="f_pair" placeholder="예: MBC/USDT">
+      <label>상태 라벨 (선택)</label>
+      <input type="text" id="f_status" placeholder="예: 운영중 / 정보 / 준비중">
+      <label>버튼 문구 (선택)</label>
+      <input type="text" id="f_buttonLabel" placeholder="예: 거래하기 ↗">
+      <label>대표 이미지 URL (선택)</label>
+      <input type="text" id="f_imageUrl" placeholder="https://...">
+      <label>설명 (선택)</label>
+      <input type="text" id="f_description" placeholder="간단한 설명">
     `;
   } else if (currentType === 'tokens') {
     fc.innerHTML = `
@@ -582,7 +602,7 @@ function resetForm() {
 
 async function loadList() {
   const listEl = document.getElementById('itemList');
-  const labelMap = { news: '소식 목록', qna: 'Q&A 목록 (사용자 글 + 답글 관리)', lab: '랩 노트 목록', links: '관련 사이트 목록', tokens: 'MBC 레이어2 토큰 목록' };
+  const labelMap = { news: '소식 목록', qna: 'Q&A 목록 (사용자 글 + 답글 관리)', lab: '랩 노트 목록', links: '관련 사이트 목록', exchanges: '상장 거래소 목록', tokens: 'MBC 레이어2 토큰 목록' };
   document.getElementById('listTitle').textContent = labelMap[currentType];
   listEl.innerHTML = '<div class="empty">불러오는 중…</div>';
   try {
@@ -594,10 +614,11 @@ async function loadList() {
       listEl.innerHTML = '<div class="empty">아직 등록된 항목이 없습니다.</div>';
       return;
     }
-    const canReorder = (currentType === 'links' || currentType === 'tokens');
+    const canReorder = (currentType === 'links' || currentType === 'tokens' || currentType === 'exchanges');
     listEl.innerHTML = items.map((it, i) => {
       let title, sub, content;
       if (currentType === 'links') { title = it.name; sub = it.url; content = it.description; }
+      else if (currentType === 'exchanges') { title = it.name; sub = [it.pair, it.status, it.url].filter(Boolean).join(' · '); content = it.description; }
       else if (currentType === 'tokens') { title = (it.ticker || '?') + ' · ' + (it.name || ''); sub = it.supply ? '최대 발행: ' + it.supply : ''; content = it.description; }
       else if (currentType === 'qna') {
         title = it.title;
@@ -762,6 +783,15 @@ async function startEdit(id) {
       document.getElementById('f_name').value = item.name || '';
       document.getElementById('f_url').value = item.url || '';
       document.getElementById('f_description').value = item.description || '';
+      document.getElementById('f_imageUrl').value = item.imageUrl || '';
+    } else if (currentType === 'exchanges') {
+      document.getElementById('f_name').value = item.name || '';
+      document.getElementById('f_url').value = item.url || '';
+      document.getElementById('f_pair').value = item.pair || '';
+      document.getElementById('f_status').value = item.status || '';
+      document.getElementById('f_buttonLabel').value = item.buttonLabel || '';
+      document.getElementById('f_imageUrl').value = item.imageUrl || '';
+      document.getElementById('f_description').value = item.description || '';
     } else if (currentType === 'tokens') {
       document.getElementById('f_ticker').value = item.ticker || '';
       document.getElementById('f_name').value = item.name || '';
@@ -795,7 +825,17 @@ async function saveItem() {
     body.name = document.getElementById('f_name').value.trim();
     body.url = document.getElementById('f_url').value.trim();
     body.description = document.getElementById('f_description').value.trim();
+    body.imageUrl = document.getElementById('f_imageUrl').value.trim();
     if (!body.name || !body.url) { toast('사이트 이름과 URL을 입력하세요', true); return; }
+  } else if (currentType === 'exchanges') {
+    body.name = document.getElementById('f_name').value.trim();
+    body.url = document.getElementById('f_url').value.trim();
+    body.pair = document.getElementById('f_pair').value.trim();
+    body.status = document.getElementById('f_status').value.trim();
+    body.buttonLabel = document.getElementById('f_buttonLabel').value.trim();
+    body.imageUrl = document.getElementById('f_imageUrl').value.trim();
+    body.description = document.getElementById('f_description').value.trim();
+    if (!body.name || !body.url) { toast('거래소 이름과 URL을 입력하세요', true); return; }
   } else if (currentType === 'tokens') {
     body.ticker = document.getElementById('f_ticker').value.trim().toUpperCase();
     body.name = document.getElementById('f_name').value.trim();

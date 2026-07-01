@@ -504,6 +504,7 @@ function navigate(page, fromPopstate) {
   if (page === 'qna' && typeof loadQnaList === 'function') loadQnaList(1);
   if (page === 'lab' && typeof loadBoard === 'function') loadBoard('lab');
   if (page === 'links' && typeof loadBoard === 'function') loadBoard('links');
+  if (page === 'exchanges' && typeof loadBoard === 'function') loadBoard('exchanges');
   if (page === 'tokens' && typeof loadTokensList === 'function') loadTokensList();
 }
 
@@ -1108,17 +1109,51 @@ function safeUrl(u) {
   return '#';
 }
 
+function urlHost(u) {
+  try {
+    return new URL(safeUrl(u)).hostname.replace(/^www\./, '') || '';
+  } catch (e) { return ''; }
+}
+
+function faviconUrl(u) {
+  const href = safeUrl(u);
+  if (href === '#') return '';
+  return 'https://www.google.com/s2/favicons?sz=64&domain_url=' + encodeURIComponent(href);
+}
+
+function boardVisual(it) {
+  const img = String((it && it.imageUrl) || '').trim();
+  if (img) {
+    return `<img src="${escHtml(safeUrl(img))}" alt="" loading="lazy" onerror="this.style.display='none';">`;
+  }
+  const icon = faviconUrl(it && it.url);
+  const host = urlHost(it && it.url);
+  return `<div style="display:flex; align-items:center; justify-content:center; gap:10px; width:100%; height:100%; background:linear-gradient(135deg,#16005C,#2A1480); color:#fff;">
+    ${icon ? `<img src="${escHtml(icon)}" alt="" loading="lazy" style="width:34px; height:34px; border-radius:8px; background:#fff; padding:4px;">` : ''}
+    <span style="font-size:17px; font-weight:800;">${escHtml(host || (it && it.name) || 'LINK')}</span>
+  </div>`;
+}
+
+function defaultExchangeItems() {
+  return [
+    { name:'LBank', url:'https://www.lbank.com/trade/mbc_usdt', pair:'MBC/USDT', status:'운영중', buttonLabel:'거래하기 ↗', description:'2015년 설립된 글로벌 암호화폐 거래소. 현재 MBC의 메인 유동성 풀입니다.', imageUrl:'/assets/exchanges/lbank.jpg' },
+    { name:'CoinMarketCap', url:'https://coinmarketcap.com/currencies/microbitcoin/markets/', pair:'전체 마켓', status:'정보', buttonLabel:'목록 보기 ↗', description:'실시간 가격, 거래량, 모든 상장 거래소 목록을 확인할 수 있습니다.' },
+    { name:'신규 상장 정보', url:'#', pair:'- / -', status:'준비중', buttonLabel:'정보 수집 중', description:'신규 상장 정보가 들어오면 업데이트됩니다.' }
+  ];
+}
+
 async function loadBoard(type) {
   const containerId = type + 'List';
   const el = document.getElementById(containerId);
   if (!el) return;
   try {
     let data = await fetchBoardItems(type);
-    const items = data.items || [];
+    let items = data.items || [];
+    if (type === 'exchanges' && items.length === 0) items = defaultExchangeItems();
 
     if (items.length === 0) {
       el.innerHTML = '<div style="text-align:center; padding:40px 20px; color:#999; ' +
-        (type === 'links' ? 'grid-column:1/-1;' : '') + '">아직 등록된 항목이 없습니다.</div>';
+        (type === 'links' || type === 'exchanges' ? 'grid-column:1/-1;' : '') + '">아직 등록된 항목이 없습니다.</div>';
       return;
     }
 
@@ -1146,18 +1181,38 @@ async function loadBoard(type) {
       `).join('');
     } else if (type === 'links') {
       el.innerHTML = items.map(it => `
-        <a href="${escHtml(safeUrl(it.url))}" target="_blank" rel="noopener" class="exchange-card" style="text-decoration:none; padding:18px 20px; display:flex; flex-direction:column; gap:8px;">
-          <div style="font-size:15px; font-weight:800; color:var(--mbc-navy); display:flex; align-items:center; gap:8px;">
-            🔗 <span>${escHtml(it.name)}</span>
+        <a href="${escHtml(safeUrl(it.url))}" target="_blank" rel="noopener" class="exchange-card" style="text-decoration:none; padding:0; overflow:hidden;">
+          <div class="ex-banner" style="height:112px;">${boardVisual(it)}</div>
+          <div class="ex-body" style="padding:16px 18px;">
+            <div class="ex-name" style="font-size:16px;">${escHtml(it.name)}</div>
+            ${it.description ? `<div class="ex-info" style="margin-top:8px; min-height:42px;">${escHtml(it.description)}</div>` : ''}
+            <div style="font-size:11px; color:var(--mbc-accent); margin-top:12px; word-break:break-all;">${escHtml(urlHost(it.url) || it.url)} ↗</div>
           </div>
-          ${it.description ? `<div style="font-size:12px; color:var(--text-sub); line-height:1.5;">${escHtml(it.description)}</div>` : ''}
-          <div style="font-size:11px; color:var(--mbc-accent); margin-top:4px; word-break:break-all;">${escHtml(it.url)} ↗</div>
         </a>
       `).join('');
+    } else if (type === 'exchanges') {
+      el.innerHTML = items.map(it => {
+        const href = safeUrl(it.url);
+        const isLink = href !== '#';
+        const status = it.status || '정보';
+        const btn = it.buttonLabel || (isLink ? '바로가기 ↗' : '정보 수집 중');
+        return `
+          <div class="exchange-card">
+            <div class="ex-badge tier1">${escHtml(status)}</div>
+            <div class="ex-banner">${boardVisual(it)}</div>
+            <div class="ex-body">
+              <div class="ex-name">${escHtml(it.name)}</div>
+              <div class="ex-pairs"><span class="ex-pair">${escHtml(it.pair || '- / -')}</span></div>
+              ${it.description ? `<div class="ex-info">${escHtml(it.description)}</div>` : ''}
+              ${isLink ? `<a class="ex-btn" href="${escHtml(href)}" target="_blank" rel="noopener">${escHtml(btn)}</a>` : `<a class="ex-btn">${escHtml(btn)}</a>`}
+            </div>
+          </div>
+        `;
+      }).join('');
     }
   } catch (e) {
     el.innerHTML = '<div style="text-align:center; padding:30px; color:#C62828; ' +
-      (type === 'links' ? 'grid-column:1/-1;' : '') + '">로드 실패: ' + escHtml(e.message) + '</div>';
+      (type === 'links' || type === 'exchanges' ? 'grid-column:1/-1;' : '') + '">로드 실패: ' + escHtml(e.message) + '</div>';
   }
 }
 

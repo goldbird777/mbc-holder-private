@@ -1305,7 +1305,7 @@ app.get('/api/whales', function(req, res) {
 // ─────────────────────────────────────────────────────────
 var BOARD_DIR = '/home/ubuntu/board_data';
 var PUBLIC_BOARD_DIR = '/var/www/html/data/board';
-var BOARD_TYPES = ['news', 'qna', 'lab', 'links', 'tokens'];
+var BOARD_TYPES = ['news', 'qna', 'lab', 'links', 'tokens', 'exchanges'];
 
 // 어드민 비밀번호 로드
 var ADMIN_PASSWORD = '';
@@ -1455,10 +1455,16 @@ app.post('/api/board/:type', function(req, res) {
             item.question = item.title;
             item.answer = item.content;
         }
-    } else if (req.params.type === 'links') {
+    } else if (req.params.type === 'links' || req.params.type === 'exchanges') {
         item.name = (body.name || '').toString().slice(0, 100);
         item.url = (body.url || '').toString().slice(0, 500);
-        item.description = (body.description || '').toString().slice(0, 300);
+        item.description = (body.description || '').toString().slice(0, 800);
+        item.imageUrl = (body.imageUrl || '').toString().slice(0, 500);
+        if (req.params.type === 'exchanges') {
+            item.pair = (body.pair || '').toString().slice(0, 80);
+            item.status = (body.status || '').toString().slice(0, 40);
+            item.buttonLabel = (body.buttonLabel || '').toString().slice(0, 40);
+        }
     } else if (req.params.type === 'tokens') {
         item.ticker = (body.ticker || '').toString().toUpperCase().slice(0, 20);
         item.name = (body.name || '').toString().slice(0, 100);
@@ -1490,10 +1496,16 @@ app.put('/api/board/:type/:id', function(req, res) {
             item.question = item.title;
             item.answer = item.content;
         }
-    } else if (req.params.type === 'links') {
+    } else if (req.params.type === 'links' || req.params.type === 'exchanges') {
         if (body.name != null) item.name = body.name.toString().slice(0, 100);
         if (body.url != null) item.url = body.url.toString().slice(0, 500);
-        if (body.description != null) item.description = body.description.toString().slice(0, 300);
+        if (body.description != null) item.description = body.description.toString().slice(0, 800);
+        if (body.imageUrl != null) item.imageUrl = body.imageUrl.toString().slice(0, 500);
+        if (req.params.type === 'exchanges') {
+            if (body.pair != null) item.pair = body.pair.toString().slice(0, 80);
+            if (body.status != null) item.status = body.status.toString().slice(0, 40);
+            if (body.buttonLabel != null) item.buttonLabel = body.buttonLabel.toString().slice(0, 40);
+        }
     } else if (req.params.type === 'tokens') {
         if (body.ticker != null) item.ticker = body.ticker.toString().toUpperCase().slice(0, 20);
         if (body.name != null) item.name = body.name.toString().slice(0, 100);
@@ -1523,7 +1535,7 @@ app.delete('/api/board/:type/:id', function(req, res) {
 app.post('/api/board/:type/:id/move', function(req, res) {
     if (!isAdmin(req)) return res.status(401).json({ error: 'unauthorized' });
     var type = req.params.type;
-    if (type !== 'links' && type !== 'tokens') return res.status(400).json({ error: 'reorder not allowed for this board' });
+    if (type !== 'links' && type !== 'tokens' && type !== 'exchanges') return res.status(400).json({ error: 'reorder not allowed for this board' });
     var data = loadBoard(type);
     if (data === null) return res.status(404).json({ error: 'unknown board' });
     var dir = (req.body && req.body.direction) || '';
