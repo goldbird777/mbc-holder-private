@@ -644,6 +644,7 @@ async function submitQnaWrite() {
     const data = await res.json();
     if (!res.ok) { err.textContent = data.error || '등록 실패'; return; }
     closeQnaModal();
+    alert(isPrivate ? '관리자만 볼 수 있는 글로 등록되었습니다.' : '등록되었습니다.');
     loadQnaList(1);
   } catch (e) { err.textContent = '오류: ' + e.message; }
 }
