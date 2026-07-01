@@ -788,7 +788,6 @@ function sanitizeQnaForList(item, adminView) {
     if (item.isPrivate && !adminView) {
         s.content = '';
         s.replies = [];
-        s.author = '관리자 전용';
         s.viewCount = 0;
     }
     return s;
