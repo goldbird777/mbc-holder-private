@@ -177,9 +177,11 @@ function limitedAll(items, concurrency, taskFn) {
 // ── 홀더 목록 (page/limit 페이지네이션 + mtime 캐시) ───────────
 // holders.json은 25k+ 항목. parse/totalSupply는 mtime 동안 1회만 수행.
 // 페이지 응답은 매번 stringify (50개라 비용 작음). 전체 응답(CSV용)은 캐시.
-var holdersCache = { mtime: 0, parsed: null, fullBody: null, totalSupply: 0 };
+var holdersCache = { mtime: 0, parsed: null, fullBody: null, totalSupply: 0, loadedAt: 0 };
+var HOLDERS_CACHE_TTL = 5 * 60 * 1000;
 function getHoldersData() {
     var path = '/home/ubuntu/mbc_holders_final.json';
+    if (holdersCache.parsed && (Date.now() - holdersCache.loadedAt) < HOLDERS_CACHE_TTL) return holdersCache;
     var stat = fs.statSync(path);
     var mtime = stat.mtimeMs;
     if (holdersCache.parsed && holdersCache.mtime === mtime) return holdersCache;
@@ -187,7 +189,7 @@ function getHoldersData() {
     var arr = parsed.holders || [];
     var sum = 0;
     for (var i = 0; i < arr.length; i++) sum += (arr[i].balance || 0);
-    holdersCache = { mtime: mtime, parsed: parsed, fullBody: null, totalSupply: sum };
+    holdersCache = { mtime: mtime, parsed: parsed, fullBody: null, totalSupply: sum, loadedAt: Date.now() };
     return holdersCache;
 }
 app.get('/api/holders', function(req, res) {
