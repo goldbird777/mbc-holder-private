@@ -202,6 +202,24 @@ function listTransfers(opts) {
     };
 }
 
+function recentTransfers(limit) {
+    limit = Math.min(100, Math.max(1, parseInt(limit) || 50));
+    return db.prepare(`
+        SELECT txid, block, time, from_addr, to_addr, amount, is_pool
+        FROM transfers
+        ORDER BY block DESC, txid
+        LIMIT ?
+    `).all(limit).map(r => ({
+        txid: r.txid,
+        block: r.block,
+        time: r.time,
+        from: r.from_addr,
+        to: r.to_addr,
+        amount: r.amount,
+        is_pool: !!r.is_pool
+    }));
+}
+
 function stats() {
     const total = db.prepare('SELECT COUNT(*) AS c FROM transfers').get().c;
     const latest = db.prepare('SELECT MAX(block) AS b FROM transfers').get().b;
@@ -232,6 +250,7 @@ module.exports = {
     insertTransfer,
     insertTransfersBatch,
     listTransfers,
+    recentTransfers,
     stats,
     getProgress,
     setProgress,

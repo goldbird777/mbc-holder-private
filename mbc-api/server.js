@@ -722,11 +722,11 @@ function pickAddr(spk) {
 }
 
 async function buildRecentTransfers() {
-    var result = transfersDb.listTransfers({ page: 1, perPage: RECENT_MAX });
-    var stats = transfersDb.stats();
+    var transfers = transfersDb.recentTransfers(RECENT_MAX);
+    var latestBlock = transfers.length ? transfers[0].block : 0;
     return {
-        transfers: result.items || [],
-        blockHeight: stats.latestBlock || 0,
+        transfers: transfers,
+        blockHeight: latestBlock,
         scanBlocks: 0,
         source: 'transfers_db',
         updatedAt: new Date().toISOString()
