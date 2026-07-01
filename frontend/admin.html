@@ -120,6 +120,7 @@
   <div class="tabs">
     <div class="tab active" data-type="news" onclick="switchType('news')">📰 최근 소식</div>
     <div class="tab" data-type="qna" onclick="switchType('qna')">❓ Q&amp;A</div>
+    <div class="tab" data-type="lab" onclick="switchType('lab')">🧪 랩 노트</div>
     <div class="tab" data-type="links" onclick="switchType('links')">🔗 관련 사이트</div>
     <div class="tab" data-type="tokens" onclick="switchType('tokens')">🪙 MBC2 토큰</div>
     <div class="tab" data-type="pools" onclick="switchType('pools')">🏊 채굴풀 주소</div>
@@ -566,9 +567,9 @@ function renderForm() {
   } else {
     fc.innerHTML = `
       <label>${currentType === 'qna' ? '질문' : '제목'}</label>
-      <input type="text" id="f_title" placeholder="${currentType === 'qna' ? '질문 내용' : '소식 제목'}">
+      <input type="text" id="f_title" placeholder="${currentType === 'qna' ? '질문 내용' : (currentType === 'lab' ? '랩 노트 제목' : '소식 제목')}">
       <label>${currentType === 'qna' ? '답변' : '본문'}</label>
-      <textarea id="f_content" placeholder="${currentType === 'qna' ? '답변 내용' : '본문 내용'}"></textarea>
+      <textarea id="f_content" placeholder="${currentType === 'qna' ? '답변 내용' : (currentType === 'lab' ? '채굴, 지갑, 서버, 노드 실험 기록' : '본문 내용')}"></textarea>
     `;
   }
   document.getElementById('formTitle').textContent = editingId ? '항목 수정' : '새 항목 작성';
@@ -581,7 +582,7 @@ function resetForm() {
 
 async function loadList() {
   const listEl = document.getElementById('itemList');
-  const labelMap = { news: '소식 목록', qna: 'Q&A 목록 (사용자 글 + 답글 관리)', links: '관련 사이트 목록', tokens: 'MBC 레이어2 토큰 목록' };
+  const labelMap = { news: '소식 목록', qna: 'Q&A 목록 (사용자 글 + 답글 관리)', lab: '랩 노트 목록', links: '관련 사이트 목록', tokens: 'MBC 레이어2 토큰 목록' };
   document.getElementById('listTitle').textContent = labelMap[currentType];
   listEl.innerHTML = '<div class="empty">불러오는 중…</div>';
   try {

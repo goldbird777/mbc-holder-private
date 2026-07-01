@@ -1288,7 +1288,7 @@ app.get('/api/whales', function(req, res) {
 // ─────────────────────────────────────────────────────────
 var BOARD_DIR = '/home/ubuntu/board_data';
 var PUBLIC_BOARD_DIR = '/var/www/html/data/board';
-var BOARD_TYPES = ['news', 'qna', 'links', 'tokens'];
+var BOARD_TYPES = ['news', 'qna', 'lab', 'links', 'tokens'];
 
 // 어드민 비밀번호 로드
 var ADMIN_PASSWORD = '';
@@ -1434,7 +1434,7 @@ app.post('/api/board/:type', function(req, res) {
         updatedAt: new Date().toISOString()
     };
 
-    if (req.params.type === 'news' || req.params.type === 'qna') {
+    if (req.params.type === 'news' || req.params.type === 'qna' || req.params.type === 'lab') {
         item.title = (body.title || '').toString().slice(0, 200);
         item.content = (body.content || '').toString().slice(0, 20000);
         if (req.params.type === 'qna') {
@@ -1469,7 +1469,7 @@ app.put('/api/board/:type/:id', function(req, res) {
 
     var body = req.body || {};
     var item = data[idx];
-    if (req.params.type === 'news' || req.params.type === 'qna') {
+    if (req.params.type === 'news' || req.params.type === 'qna' || req.params.type === 'lab') {
         if (body.title != null) item.title = body.title.toString().slice(0, 200);
         if (body.content != null) item.content = body.content.toString().slice(0, 20000);
         if (req.params.type === 'qna') {

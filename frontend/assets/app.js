@@ -427,6 +427,7 @@ const PAGE_META = {
   tokens:    { title:'MBC 레이어2 토큰 일람 - MicroBitcoin Layer2 토큰 | MicroBitcoin 탐색기', desc:'MicroBitcoin 레이어2 발행 토큰 목록과 각 토큰의 보유 정보.' },
   news:      { title:'MBC 최근 소식 - MicroBitcoin 공지·이벤트 | MicroBitcoin 탐색기', desc:'MicroBitcoin 관련 공지·업데이트·이벤트 등 운영자가 직접 등록한 최신 소식.' },
   qna:       { title:'MBC Q&A - 자주 묻는 질문과 답변 | MicroBitcoin 탐색기', desc:'MicroBitcoin 관련 자주 묻는 질문(FAQ)과 답변 모음.' },
+  lab:       { title:'랩 노트 - 채굴·지갑·서버 실험 기록 | MicroBitcoin 탐색기', desc:'채굴, 지갑, 서버, 노드, 코인 실험과 운영 기록을 정리한 랩 노트.' },
   links:     { title:'MBC 관련 사이트 모음 - 공식·커뮤니티 링크 | MicroBitcoin 탐색기', desc:'MicroBitcoin 공식 사이트·커뮤니티·도구 등 관련 사이트 링크 모음.' },
   about:     { title:'사이트 소개 - MBC 홀더 탐색기 | MicroBitcoin Holder Explorer', desc:'MBC 홀더 탐색기는 MicroBitcoin 풀노드를 직접 운영하여 실시간 홀더 데이터를 제공합니다.' },
   privacy:   { title:'개인정보처리방침 | MBC 홀더 탐색기', desc:'MBC 홀더 탐색기의 개인정보 수집·이용 정책.' },
@@ -501,6 +502,7 @@ function navigate(page, fromPopstate) {
   // 게시판 페이지 진입 시 데이터 로드
   if (page === 'news' && typeof loadBoard === 'function') loadBoard('news');
   if (page === 'qna' && typeof loadQnaList === 'function') loadQnaList(1);
+  if (page === 'lab' && typeof loadBoard === 'function') loadBoard('lab');
   if (page === 'links' && typeof loadBoard === 'function') loadBoard('links');
   if (page === 'tokens' && typeof loadTokensList === 'function') loadTokensList();
 }
@@ -973,7 +975,7 @@ async function loadBoard(type) {
       return;
     }
 
-    if (type === 'news') {
+    if (type === 'news' || type === 'lab') {
       el.innerHTML = items.map(it => `
         <div class="static-card" style="padding:20px 24px;">
           <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:10px;">
@@ -1417,7 +1419,7 @@ async function loadTransactions() {
 }
 
 // ── 라우트 파싱 ─────────────────────────
-const VALID_PAGES = ['holders','transfers','whales','search','stats','mining','exchanges','wonpay','tokens','news','qna','qna-detail','links','about','privacy','contact'];
+const VALID_PAGES = ['holders','transfers','whales','search','stats','mining','exchanges','wonpay','tokens','news','qna','qna-detail','lab','links','about','privacy','contact'];
 
 function parseRoute() {
   // 우선순위: pathname → hash (legacy #holders 등 구글 인덱스 호환)
