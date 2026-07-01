@@ -12,7 +12,10 @@ function open() {
     db = new Database(DB_PATH);
     db.pragma('journal_mode = WAL');
     db.pragma('synchronous = NORMAL');
-    db.pragma('cache_size = -64000');  // 64MB
+    db.pragma('cache_size = -32000');  // 32MB: keep API memory modest on 1GB hosts
+    db.pragma('temp_store = MEMORY');
+    db.pragma('busy_timeout = 5000');
+    db.pragma('mmap_size = 268435456');
     init();
     return db;
 }
@@ -34,6 +37,8 @@ function init() {
         CREATE INDEX IF NOT EXISTS idx_time_desc ON transfers(time DESC);
         CREATE INDEX IF NOT EXISTS idx_from ON transfers(from_addr);
         CREATE INDEX IF NOT EXISTS idx_to ON transfers(to_addr);
+        CREATE INDEX IF NOT EXISTS idx_amount_time ON transfers(amount, time);
+        CREATE INDEX IF NOT EXISTS idx_pool_amount_time ON transfers(is_pool, amount, time);
         CREATE TABLE IF NOT EXISTS scan_progress (
             key TEXT PRIMARY KEY,
             value INTEGER NOT NULL
@@ -220,19 +225,22 @@ function recentTransfers(limit) {
     }));
 }
 
+let statsCache = { ts: 0, data: null };
 function stats() {
+    if (statsCache.data && Date.now() - statsCache.ts < 30000) return statsCache.data;
     const total = db.prepare('SELECT COUNT(*) AS c FROM transfers').get().c;
     const latest = db.prepare('SELECT MAX(block) AS b FROM transfers').get().b;
     const earliest = db.prepare('SELECT MIN(block) AS b FROM transfers').get().b;
     const fullscanCursor = getProgress('fullscan_block');
     const lastIncremental = getProgress('last_incremental_block');
-    return {
+    statsCache = { ts: Date.now(), data: {
         total: total,
         latestBlock: latest,
         earliestBlock: earliest,
         fullscanCursor: fullscanCursor,
         lastIncremental: lastIncremental
-    };
+    } };
+    return statsCache.data;
 }
 
 function countLargeSince(threshold, sinceTime, excludePool) {

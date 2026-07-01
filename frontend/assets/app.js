@@ -1106,10 +1106,10 @@ async function loadWhales(page) {
 
     // 자동 갱신 (1페이지에서만) — poll 시 캐시 무효화
     if (whalePollTimer) clearInterval(whalePollTimer);
-    if (page === 1) whalePollTimer = setInterval(() => { whaleCache.clear(); loadWhales(1); }, 30000);
+    if (page === 1) whalePollTimer = setInterval(() => { whaleCache.clear(); loadWhales(1); }, 180000);
 
     // 인접 페이지 prefetch (idle)
-    prefetchAdjacent(data.page || page, 'whale');
+    // Disabled speculative prefetch on the low-memory Oracle host.
   } catch (e) {
     body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#C62828;">로드 실패: ' + e.message + '</td></tr>';
   }
@@ -1135,7 +1135,7 @@ function renderWhalePagination(totalPages, currentPage) {
 // ── 트랜잭션 탐색 (etherscan 스타일) ──────────────────
 let txState = { page: 1, perPage: 25, address: '', excludePool: false, excludeDust: false, dustThreshold: 1 };
 let txPollTimer = null;
-const TX_POLL_INTERVAL = 30 * 1000;
+const TX_POLL_INTERVAL = 120 * 1000;
 
 // 클라이언트 페이지 캐시 (TTL 300초)
 const PAGE_CACHE_TTL = 300 * 1000;
@@ -1173,6 +1173,7 @@ function buildWhaleQs(pageOverride) {
   return qs.toString();
 }
 function prefetchAdjacent(cur, kind) {
+  return;
   const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 200));
   [cur - 1, cur + 1].forEach(pp => {
     if (pp < 1) return;
@@ -1409,7 +1410,7 @@ async function loadTransactions() {
 
     renderTxPagination(data.totalPages || 1, data.page || 1);
     // 인접 페이지 prefetch (idle)
-    prefetchAdjacent(data.page || txState.page, 'tx');
+    // Disabled speculative prefetch on the low-memory Oracle host.
   } catch (e) {
     body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#C62828;">로드 실패: ' + e.message + '</td></tr>';
   }
@@ -1604,7 +1605,7 @@ function processTokenBatch() {
     if (cell) renderTokenCell(cell, cached, item.address);
   }
   if (tokenLoadQueue.length === 0) return;
-  const batch = tokenLoadQueue.splice(0, 10);
+  const batch = tokenLoadQueue.splice(0, 5);
   const addrs = batch.map(item => item.address).join(',');
   fetch('/api/tokens/addresses?addrs=' + encodeURIComponent(addrs))
     .then(r => r.json())
@@ -1625,7 +1626,7 @@ function processTokenBatch() {
       });
     })
     .finally(() => {
-      if (tokenLoadQueue.length > 0) tokenLoadTimer = setTimeout(processTokenBatch, 500);
+      if (tokenLoadQueue.length > 0) tokenLoadTimer = setTimeout(processTokenBatch, 900);
     });
 }
 

@@ -467,7 +467,7 @@ app.get('/api/tokens/addresses', function(req, res) {
 
     if (addrs.length === 0) return res.json({ results: {} });
 
-    limitedAll(addrs, 4, function(addr) {
+    limitedAll(addrs, 2, function(addr) {
         return fetchTokenAddress(addr)
             .then(function(data) { return { addr: addr, data: data }; })
             .catch(function(e) { return { addr: addr, data: { error: e.message, balances: [] } }; });
@@ -716,6 +716,7 @@ app.get('/api/mining-info', function(req, res) {
 var recentCache = { ts: 0, data: { transfers: [], blockHeight: 0, updatedAt: null, loading: true } };
 var RECENT_SCAN_BLOCKS = 5;
 var RECENT_MAX = 50;
+var RECENT_CACHE_TTL = 60 * 1000;
 var recentRefreshInFlight = false;
 
 function pickAddr(spk) {
@@ -753,6 +754,9 @@ async function refreshRecentTransfers() {
 // transfers.db; this endpoint serves the last in-memory cache without polling.
 
 app.get('/api/recent-transfers', function(req, res) {
+    if ((!recentCache.ts || Date.now() - recentCache.ts > RECENT_CACHE_TTL) && !recentRefreshInFlight) {
+        refreshRecentTransfers();
+    }
     res.json(recentCache.data);
 });
 
