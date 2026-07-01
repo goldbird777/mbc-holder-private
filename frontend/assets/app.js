@@ -559,10 +559,14 @@ async function loadQnaList(page) {
         ? '<span style="display:inline-block; padding:3px 10px; background:#E8F5E9; color:var(--green); border-radius:10px; font-size:11px; font-weight:700;">답변완료</span>'
         : '<span style="display:inline-block; padding:3px 10px; background:#FFF8E1; color:#6D4C00; border-radius:10px; font-size:11px; font-weight:700;">답변대기</span>';
       const date = new Date(it.createdAt).toLocaleDateString('ko-KR', {month:'2-digit', day:'2-digit'});
+      const locked = !!it.isPrivate;
+      const titleHtml = locked
+        ? `<span style="display:inline-flex; align-items:center; gap:6px;"><span aria-label="관리자 전용">🔒</span><span>${esc(it.title || '관리자만 볼 수 있는 글입니다.')}</span></span>`
+        : esc(it.title);
       return `<tr style="cursor:pointer;" onclick="showQnaDetail('${it.id}')">
         <td class="center" style="color:var(--text-sub);">${num}</td>
         <td class="center">${statusBadge}</td>
-        <td style="font-weight:600;">${esc(it.title)}${it.replyCount > 0 ? ` <span style="color:var(--mbc-accent); font-size:11px;">[${it.replyCount}]</span>` : ''}</td>
+        <td style="font-weight:600;">${titleHtml}${it.replyCount > 0 ? ` <span style="color:var(--mbc-accent); font-size:11px;">[${it.replyCount}]</span>` : ''}</td>
         <td class="center" style="font-size:12px; color:var(--text-sub);">${esc(it.author || '익명')}</td>
         <td class="center" style="font-size:12px; color:var(--text-sub);">${date}</td>
         <td class="center" style="font-size:12px; color:var(--text-sub);">${it.viewCount || 0}</td>
@@ -644,12 +648,9 @@ async function submitQnaWrite() {
     const data = await res.json();
     if (!res.ok) { err.textContent = data.error || '등록 실패'; return; }
     if (isPrivate) {
-      err.style.color = 'var(--green)';
-      err.textContent = '관리자만 볼 수 있는 글로 등록되었습니다. 공개 목록에는 표시되지 않습니다.';
-      setTimeout(closeQnaModal, 900);
-    } else {
-      closeQnaModal();
+      alert('관리자만 볼 수 있는 글로 등록되었습니다.');
     }
+    closeQnaModal();
     loadQnaList(1);
   } catch (e) { err.textContent = '오류: ' + e.message; }
 }
@@ -694,6 +695,11 @@ async function showQnaDetail(id, fromPopstate) {
   card.innerHTML = '<div style="text-align:center; padding:30px; color:#999;">불러오는 중…</div>';
   try {
     const res = await fetch('/api/qna/' + encodeURIComponent(id));
+    if (res.status === 403) {
+      alert('관리자만 볼 수 있습니다.');
+      navigate('qna', true);
+      return;
+    }
     if (!res.ok) { card.innerHTML = '<div style="text-align:center; padding:30px; color:var(--red);">글을 찾을 수 없습니다</div>'; return; }
     const it = await res.json();
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

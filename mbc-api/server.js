@@ -781,6 +781,19 @@ function publicQnaItems(data) {
     return (Array.isArray(data) ? data : []).filter(function(it) { return !it.isPrivate; });
 }
 
+function sanitizeQnaForList(item, adminView) {
+    var s = sanitizeQna(item);
+    s.hasReply = !!(item.replies && item.replies.length > 0);
+    s.replyCount = item.replies ? item.replies.length : 0;
+    if (item.isPrivate && !adminView) {
+        s.content = '';
+        s.replies = [];
+        s.author = '관리자 전용';
+        s.viewCount = 0;
+    }
+    return s;
+}
+
 // 목록 조회 (페이지네이션)
 app.get('/api/qna', function(req, res) {
     var page = Math.max(1, parseInt(req.query.page) || 1);
@@ -791,16 +804,12 @@ app.get('/api/qna', function(req, res) {
         try { return JSON.parse(fs.readFileSync(f, 'utf8')); }
         catch (e) { return []; }
     })();
-    if (!isAdmin(req)) data = publicQnaItems(data);
+    var adminView = isAdmin(req);
     var total = data.length;
     var totalPages = Math.ceil(total / perPage);
     var offset = (page - 1) * perPage;
     var items = data.slice(offset, offset + perPage).map(function(it) {
-        var s = sanitizeQna(it);
-        // 답변 상태
-        s.hasReply = !!(it.replies && it.replies.length > 0);
-        s.replyCount = it.replies ? it.replies.length : 0;
-        return s;
+        return sanitizeQnaForList(it, adminView);
     });
     res.json({
         items: items,
@@ -816,7 +825,7 @@ app.get('/api/qna/:id', function(req, res) {
     var data = loadBoard('qna') || [];
     var idx = data.findIndex(function(x) { return x.id === req.params.id; });
     if (idx < 0) return res.status(404).json({ error: 'not found' });
-    if (data[idx].isPrivate && !isAdmin(req)) return res.status(404).json({ error: 'not found' });
+    if (data[idx].isPrivate && !isAdmin(req)) return res.status(403).json({ error: '관리자만 볼 수 있습니다.' });
     // 조회수 +1
     data[idx].viewCount = (data[idx].viewCount || 0) + 1;
     saveBoard('qna', data);
@@ -1357,15 +1366,11 @@ function publicBoardFile(type) {
 function publicBoardPayload(type, data) {
     data = Array.isArray(data) ? data : [];
     if (type === 'qna') {
-        var visible = publicQnaItems(data);
         return {
-            items: visible.map(function(it) {
-                var s = sanitizeQna(it);
-                s.hasReply = !!(it.replies && it.replies.length > 0);
-                s.replyCount = it.replies ? it.replies.length : 0;
-                return s;
+            items: data.map(function(it) {
+                return sanitizeQnaForList(it, false);
             }),
-            total: visible.length,
+            total: data.length,
             updatedAt: new Date().toISOString()
         };
     }
