@@ -747,8 +747,8 @@ async function refreshRecentTransfers() {
     }
 }
 
-setInterval(refreshRecentTransfers, 30 * 1000);
-setTimeout(refreshRecentTransfers, 2000); // 서버 시작 직후 1회
+// Keep the API process responsive on 1CPU hosts. Incremental scan workers update
+// transfers.db; this endpoint serves the last in-memory cache without polling.
 
 app.get('/api/recent-transfers', function(req, res) {
     res.json(recentCache.data);
