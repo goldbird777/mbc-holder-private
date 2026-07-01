@@ -762,6 +762,48 @@ async function fetchTokenList(force) {
   tokenListCache = data.items || [];
   return tokenListCache;
 }
+
+function normalizeTokenDescription(raw) {
+  return String(raw == null ? '' : raw)
+    .replace(/<img\b[^>]*>/gi, ' ')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|h[1-6]|li|ul|ol)>/gi, '\n')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\r\n/g, '\n')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function extractTokenImages(raw) {
+  const text = String(raw == null ? '' : raw);
+  const urls = [];
+  text.replace(/<img\b[^>]*\bsrc\s*=\s*["']?\s*([^"'\s>]+)\s*["']?[^>]*>/gi, (_, url) => {
+    if (/^https?:\/\//i.test(url) && !urls.includes(url)) urls.push(url);
+    return '';
+  });
+  return urls.slice(0, 3);
+}
+
+function linkifyTokenText(text) {
+  return escHtml(text).replace(/(https?:\/\/[^\s<]+)/g, url => {
+    const clean = url.replace(/[),.;]+$/, '');
+    const tail = url.slice(clean.length);
+    return `<a href="${clean}" target="_blank" rel="noopener" style="color:var(--mbc-accent); font-weight:700;">${clean}</a>${tail}`;
+  });
+}
+
+function renderTokenDescription(raw, mode) {
+  const normalized = normalizeTokenDescription(raw);
+  const images = mode === 'detail' ? extractTokenImages(raw) : [];
+  const imageHtml = images.map(url => `
+    <img src="${escHtml(url)}" alt="token image" loading="lazy"
+         style="display:block; width:100%; max-width:760px; max-height:360px; object-fit:contain; border:1px solid var(--border); border-radius:8px; background:#fff; margin:0 0 12px;">
+  `).join('');
+  const textHtml = normalized ? linkifyTokenText(normalized).replace(/\n/g, '<br>') : '';
+  return imageHtml + (textHtml || '<span style="color:#999;">등록된 설명이 없습니다.</span>');
+}
+
 async function loadTokensList() {
   const el = document.getElementById('tokensList');
   if (!el) return;
@@ -771,11 +813,11 @@ async function loadTokensList() {
       el.innerHTML = '<div style="text-align:center; padding:40px 20px; color:#999; grid-column:1/-1;">아직 등록된 토큰이 없습니다. 관리자 페이지에서 토큰을 추가해주세요.</div>';
       return;
     }
-    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const esc = escHtml;
     el.innerHTML = items.map(t => {
       const ticker = esc(t.ticker || '?');
       const name = esc(t.name || ticker);
-      const desc = esc(t.description || '');
+      const desc = renderTokenDescription(t.description || '', 'card');
       const supply = t.supply ? `<div style="font-size:11px; color:var(--text-sub); margin-top:8px;">최대 발행: <strong>${esc(t.supply)}</strong></div>` : '';
       // 아이콘: iconUrl이 있으면 이미지, 없으면 ticker 첫 글자 그라데이션 원
       const iconHtml = t.iconUrl
@@ -793,7 +835,7 @@ async function loadTokensList() {
               <div style="font-size:16px; font-weight:800; color:var(--mbc-navy); line-height:1.2;">${name}</div>
             </div>
           </div>
-          ${desc ? `<div style="font-size:12px; color:var(--text-sub); line-height:1.5;">${desc}</div>` : ''}
+          ${desc ? `<div style="font-size:12px; color:var(--text-sub); line-height:1.55; max-height:138px; overflow-y:auto; padding:10px 12px; background:var(--bg-soft); border-radius:6px; word-break:keep-all;">${desc}</div>` : ''}
           ${supply}
           <div style="margin-top:auto; font-size:12px; color:var(--mbc-accent); font-weight:700;">홀더 보기 →</div>
         </a>
@@ -832,13 +874,15 @@ async function showTokenDetail(ticker, fromPopstate) {
 
     if (token) {
       document.getElementById('tokenDetailName').textContent = token.name || ticker;
-      document.getElementById('tokenDetailDesc').textContent = token.description || '';
+      document.getElementById('tokenDetailDesc').innerHTML = renderTokenDescription(token.description || '', 'detail');
       document.getElementById('tokenDetailTicker').textContent = token.ticker || ticker;
       document.getElementById('tokenDetailSupply').textContent = token.supply || '-';
       // 헤더 아이콘 (제목 옆에 배치)
       const headerEl = document.getElementById('tokenDetailHeader');
       const tNameEl = document.getElementById('tokenDetailName');
-      if (headerEl && tNameEl && !document.getElementById('tokenDetailIcon')) {
+      const oldIcon = document.getElementById('tokenDetailIcon');
+      if (oldIcon) oldIcon.remove();
+      if (headerEl && tNameEl) {
         const iconWrap = document.createElement('div');
         iconWrap.id = 'tokenDetailIcon';
         iconWrap.style.cssText = 'display:flex; align-items:center; gap:14px; margin-bottom:10px;';

@@ -1458,7 +1458,7 @@ app.post('/api/board/:type', function(req, res) {
     } else if (req.params.type === 'tokens') {
         item.ticker = (body.ticker || '').toString().toUpperCase().slice(0, 20);
         item.name = (body.name || '').toString().slice(0, 100);
-        item.description = (body.description || '').toString().slice(0, 500);
+        item.description = (body.description || '').toString().slice(0, 8000);
         item.url = (body.url || '').toString().slice(0, 500);
         item.supply = (body.supply || '').toString().slice(0, 50);
         item.iconUrl = (body.iconUrl || '').toString().slice(0, 500);
@@ -1493,7 +1493,7 @@ app.put('/api/board/:type/:id', function(req, res) {
     } else if (req.params.type === 'tokens') {
         if (body.ticker != null) item.ticker = body.ticker.toString().toUpperCase().slice(0, 20);
         if (body.name != null) item.name = body.name.toString().slice(0, 100);
-        if (body.description != null) item.description = body.description.toString().slice(0, 500);
+        if (body.description != null) item.description = body.description.toString().slice(0, 8000);
         if (body.url != null) item.url = body.url.toString().slice(0, 500);
         if (body.supply != null) item.supply = body.supply.toString().slice(0, 50);
         if (body.iconUrl != null) item.iconUrl = body.iconUrl.toString().slice(0, 500);
