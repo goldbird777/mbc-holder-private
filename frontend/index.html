@@ -24,7 +24,7 @@
 <meta name="google-site-verification" content="PR09nIpp1oDLY4U60yHvoW30qaEshInzp8uqUCzZk3w">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1823621340722350" crossorigin="anonymous"></script>
 
-  <link rel="stylesheet" href="/assets/app.css?v=2">
+  <link rel="stylesheet" href="/assets/app.css?v=3">
 </head>
 <body>
 
@@ -1178,9 +1178,9 @@
 
   <!-- ── 서버 운영 후원 (3채널: BTC / MBC / USDT-TRC20) ── -->
   <div id="donateBar" style="background:#FFF8E1; border-top:1px solid #FFE082; border-bottom:1px solid #FFE082; padding:10px 12px; display:flex; justify-content:center;">
-    <div style="max-width:1100px; width:100%; display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:13px;">
+    <div class="donate-inner" style="max-width:1100px; width:100%; display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:13px;">
       <span style="font-size:16px;">☕</span>
-      <span style="color:#6D4C00; font-weight:600; font-size:12px;">사이트 운영 후원:</span>
+      <span class="donate-title" style="color:#6D4C00; font-weight:600; font-size:12px;">사이트 운영 후원:</span>
       <div id="donateTabs" style="display:flex; gap:4px; border:1px solid #FFE082; border-radius:6px; overflow:hidden; background:#fff;">
         <button class="donate-tab active" data-key="btc" onclick="switchDonateTab('btc')" style="padding:5px 10px; border:none; background:var(--mbc-navy); color:#fff; font-size:11px; font-weight:700; cursor:pointer;">BTC</button>
         <button class="donate-tab" data-key="mbc" onclick="switchDonateTab('mbc')" style="padding:5px 10px; border:none; background:#fff; color:var(--mbc-navy); font-size:11px; font-weight:700; cursor:pointer;">MBC</button>
@@ -1188,7 +1188,7 @@
       </div>
       <code id="donateAddr" style="background:#fff; border:1px solid #FFE082; padding:4px 10px; border-radius:6px; font-family:'Consolas',monospace; font-size:11px; color:var(--mbc-navy); cursor:pointer; user-select:all; word-break:break-all; flex:1; min-width:0;" onclick="copyDonate()">불러오는 중…</code>
       <span id="donateNetwork" style="font-size:10px; color:#9AA1B0; font-weight:600;"></span>
-      <button onclick="copyDonate()" style="background:var(--mbc-navy); color:#fff; border:none; padding:5px 11px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">📋</button>
+      <button class="donate-copy-btn" onclick="copyDonate()" style="background:var(--mbc-navy); color:#fff; border:none; padding:5px 11px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">📋</button>
       <span id="donateOk" style="color:#2E7D32; font-size:11px; font-weight:700; opacity:0; transition:opacity .3s;">✓ 복사됨</span>
     </div>
   </div>

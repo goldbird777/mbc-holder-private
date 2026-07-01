@@ -214,6 +214,11 @@
   footer .links a:hover { color: var(--mbc-navy); text-decoration: underline; }
   footer .disclaimer { color: #9AA1B0; font-size: 11px; margin-top: 12px; line-height: 1.6; }
 
+  #donateBar .donate-inner { box-sizing: border-box; }
+  #donateTabs { flex: 0 0 auto; }
+  #donateAddr { min-width: 260px; }
+  #donateNetwork, #donateOk { flex: 0 0 auto; }
+
   /* ── ⓘ 툴팁 ── */
   [data-tip] { position: relative; }
   [data-tip]:hover::after, [data-tip]:focus::after {
@@ -469,6 +474,56 @@
     header { height: 60px !important; padding: 0 12px; }
     .top-ad-bar { top: 60px !important; }
     #donateBar { padding: 8px 10px !important; }
+    #donateBar .donate-inner {
+      display: grid !important;
+      grid-template-columns: auto 1fr auto;
+      align-items: center !important;
+      gap: 8px !important;
+      font-size: 12px !important;
+    }
+    #donateBar .donate-title {
+      white-space: nowrap;
+    }
+    #donateTabs {
+      grid-column: 2 / 4;
+      width: 100%;
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    #donateTabs .donate-tab {
+      width: 100%;
+      padding: 7px 8px !important;
+      text-align: center;
+    }
+    #donateAddr {
+      grid-column: 1 / 3;
+      width: 100%;
+      min-width: 0 !important;
+      box-sizing: border-box;
+      display: block;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      line-height: 1.35;
+      padding: 8px 10px !important;
+    }
+    #donateNetwork {
+      grid-column: 1 / 2;
+      color: #9AA1B0;
+      font-size: 10px !important;
+      white-space: nowrap;
+    }
+    #donateBar .donate-copy-btn {
+      grid-column: 3 / 4;
+      grid-row: 3 / 4;
+      align-self: stretch;
+      min-width: 42px;
+      padding: 8px 10px !important;
+    }
+    #donateOk {
+      grid-column: 2 / 4;
+      min-height: 14px;
+      font-size: 10px !important;
+    }
     .layout { padding-top: 140px !important; }  /* 60 + 80(ad bar) */
 
     .sidebar {
