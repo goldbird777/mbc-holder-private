@@ -42,10 +42,6 @@
     <button id="lang-kor" class="active" onclick="setLang('ko')">KOR</button>
     <button id="lang-eng" onclick="setLang('en')">ENG</button>
   </div>
-  <div class="nav">
-    <a href="https://microbitcoin.org" target="_blank" class="external" data-i18n="nav_official">공식 사이트</a>
-    <a href="https://github.com/MicroBitcoinOrg" target="_blank" class="external">GitHub</a>
-  </div>
 </header>
 
 <!-- ── 상단 sticky 광고 배너 ── -->
@@ -1069,7 +1065,41 @@
     <!-- ─────────────── 페이지 5: 사이트 소개 ─────────────── -->
     <section class="page-section" id="page-about">
       <div class="page-title">ℹ️ <span data-i18n="page_about_title">사이트 소개</span></div>
-      <div class="page-subtitle" data-i18n="page_about_sub">MBC 홀더 탐색기에 대하여</div>
+      <div class="page-subtitle" data-i18n="page_about_sub">MicroBitcoin(MBC) 프로젝트와 본 탐색기에 대하여</div>
+
+      <div class="static-card">
+        <h2>MicroBitcoin(MBC)이란 무엇인가?</h2>
+
+        <h3 style="margin-top:18px;">1. 프로젝트 철학 — 모두를 위한 탈중앙화 결제</h3>
+        <p>MicroBitcoin(MBC)은 사토시 나카모토가 제시한 본래의 비전, 즉 <strong>"누구의 허가도 필요 없는 개인 간 전자 현금 시스템"</strong>을 현대적으로 재해석한 프로젝트입니다. 중앙 기관이나 금융 중개자 없이 전 세계 누구에게나 즉각적이고 저렴하게 가치를 전송할 수 있어야 한다는 원칙이 MBC의 출발점입니다.</p>
+        <p>MBC는 <strong>소액 결제(micropayment) 시나리오</strong>에 최적화되어 있습니다. 커피 한 잔 값을 해외로 보내거나, 콘텐츠 크리에이터가 소액 후원을 받는 상황처럼 기존 금융 시스템이 수수료 때문에 처리하기 어려운 거래를 MBC는 실용적인 비용으로 처리합니다. 탈중앙화와 접근성, 두 가지 가치를 동시에 추구하는 것이 MicroBitcoin 생태계의 핵심 철학입니다.</p>
+
+        <h3 style="margin-top:22px;">2. 기술적 차별점 — 빠르고, 저렴하고, 확장 가능한 레이어2 네트워크</h3>
+        <p>MicroBitcoin은 비트코인(BTC) 네트워크 위에 구축된 <strong>레이어2(Layer 2) 토큰</strong>입니다. 비트코인의 보안성과 신뢰성을 기반으로 하면서도 BTC가 가진 구조적 한계 — 느린 블록 생성 시간, 높은 온체인 수수료 — 를 개선하도록 설계되었습니다.</p>
+        <p>주요 기술적 장점은 다음과 같습니다.</p>
+        <ul>
+          <li><strong>빠른 전송 속도</strong>: BTC의 평균 10분 블록 타임 대비 MBC는 훨씬 짧은 대기 시간으로 트랜잭션을 처리합니다.</li>
+          <li><strong>낮은 수수료</strong>: 소액 결제가 현실적으로 가능한 수준의 트랜잭션 비용을 유지합니다.</li>
+          <li><strong>확장성</strong>: 레이어2 구조 덕분에 메인 체인의 혼잡과 무관하게 안정적인 처리량을 제공합니다.</li>
+        </ul>
+        <p>이러한 특성은 MBC를 단순한 투기 자산이 아닌, <strong>일상적인 소액 결제 수단으로서의 실용성</strong>을 갖춘 암호화폐로 만들어 줍니다.</p>
+
+        <h3 style="margin-top:22px;">3. Power2B 알고리즘 — 누구나 공평하게 채굴하는 생태계</h3>
+        <p>MicroBitcoin의 가장 독창적인 특징은 독자 개발 채굴 알고리즘인 <strong>Power2B(Power to Bitcoiners)</strong>입니다. 이 알고리즘은 두 가지 핵심 목표를 위해 설계되었습니다.</p>
+        <p><strong>첫째, CPU 친화성</strong>입니다. Power2B는 일반 컴퓨터의 CPU로 효율적으로 채굴할 수 있도록 최적화되어 있습니다. 고가의 전용 장비 없이도 개인 PC로 네트워크에 기여하고 보상을 받을 수 있습니다.</p>
+        <p><strong>둘째, ASIC 저항성</strong>입니다. 비트코인 채굴 시장은 대형 채굴 업체들이 ASIC(주문형 반도체) 장비로 해시파워를 독점하는 구조로 변질되었습니다. Power2B는 ASIC 장비가 압도적 우위를 갖지 못하도록 알고리즘 수준에서 저항하여, 소규모 개인 채굴자도 공정하게 경쟁할 수 있는 환경을 유지합니다.</p>
+        <p>이는 <strong>"채굴의 민주화"</strong>라는 MBC의 철학을 기술적으로 구현한 것입니다. 누구나 네트워크의 보안에 기여하고, 그에 상응하는 보상을 공평하게 받을 수 있습니다.</p>
+
+        <h3 style="margin-top:22px;">4. 탐색기 활용 가이드 — 데이터로 MBC 네트워크를 한눈에</h3>
+        <p>이 웹사이트는 MicroBitcoin 네트워크의 현황을 투명하게 조회할 수 있는 <strong>블록 탐색기(Block Explorer) 및 분석 대시보드</strong>입니다. 다음과 같은 기능을 활용해 보세요.</p>
+        <ul>
+          <li><strong>홀더 리스트(Holder List)</strong>: MBC 보유 지갑 주소를 보유량 기준으로 확인할 수 있습니다. 상위 홀더의 분포를 통해 탈중앙화 정도를 직접 검증해 보세요.</li>
+          <li><strong>트랜잭션 조회</strong>: 특정 지갑 주소나 트랜잭션 해시(TXID)를 검색하여 송수신 내역, 확인 횟수, 수수료 등을 실시간으로 확인할 수 있습니다.</li>
+          <li><strong>Whale Alert</strong>: 대량의 MBC가 이동하는 고액 트랜잭션을 추적합니다. 시장 움직임에 앞서 고래(Whale)의 동향을 파악하는 데 유용합니다.</li>
+          <li><strong>채굴 통계</strong>: 현재 네트워크 해시레이트, 난이도, 최근 블록 정보 등을 통해 채굴 환경과 네트워크 건전성을 모니터링할 수 있습니다.</li>
+        </ul>
+        <p>투자자, 개발자, 채굴자, 그리고 단순한 호기심을 가진 누구든 이 탐색기를 통해 MicroBitcoin 네트워크의 모든 활동을 검증하고 분석할 수 있습니다. <strong>블록체인의 핵심 가치인 투명성</strong>을 직접 경험해 보세요.</p>
+      </div>
 
       <div class="static-card">
         <h2 data-i18n="about_h1">MicroBitcoin 홀더 탐색기란?</h2>
@@ -1102,75 +1132,155 @@
     <!-- ─────────────── 페이지 6: 개인정보처리방침 ─────────────── -->
     <section class="page-section" id="page-privacy">
       <div class="page-title">🔒 <span data-i18n="page_privacy_title">개인정보처리방침</span></div>
-      <div class="page-subtitle" data-i18n="page_privacy_sub">최종 수정일: 2026년 6월</div>
+      <div class="page-subtitle" data-i18n="page_privacy_sub">최종 수정일: 2026년 6월 29일 · 시행일: 2026년 6월 29일</div>
 
       <div class="static-card">
-        <h2 data-i18n="priv_h1">1. 수집하는 정보</h2>
-        <p data-i18n="priv_p1">본 사이트는 다음 정보를 자동으로 수집할 수 있습니다.</p>
+        <p style="color:var(--text-sub); font-size:13px; line-height:1.7; margin-bottom:18px;">
+          MBC Holder Explorer(이하 “본 사이트”)는 이용자의 개인정보를 중요시하며, 「개인정보 보호법」을 비롯한 관련 법령을 준수합니다.
+          본 방침은 이용자에게 어떤 정보가 수집·이용되며 어떻게 보호되는지 안내합니다.
+        </p>
+
+        <h2>1. 수집하는 정보 및 수집 방법</h2>
+        <p>본 사이트는 회원가입 절차가 없으며, 별도의 개인 식별정보(이름·주민번호·전화번호 등)를 직접 수집하지 않습니다. 다만 서비스 운영을 위해 다음의 정보가 자동으로 수집될 수 있습니다.</p>
         <ul>
-          <li data-i18n="priv_li1">접속 IP 주소 (방문자 통계 목적)</li>
-          <li data-i18n="priv_li2">브라우저 종류 및 운영체제 정보</li>
-          <li data-i18n="priv_li3">접속 일시 및 페이지 이동 경로</li>
-          <li data-i18n="priv_li4">참조 URL</li>
+          <li>접속 IP 주소(방문자 통계 및 비정상 접근 차단 목적)</li>
+          <li>브라우저 종류 및 운영체제 정보, 화면 해상도</li>
+          <li>접속 일시, 방문 페이지, 페이지 이동 경로</li>
+          <li>참조(Referrer) URL</li>
+          <li>Q&amp;A 게시판 작성 시 이용자가 입력한 닉네임·내용·SHA-256으로 단방향 암호화된 비밀번호 해시</li>
         </ul>
 
-        <h2 data-i18n="priv_h2">2. 수집 목적</h2>
+        <h2>2. 수집 목적</h2>
         <ul>
-          <li data-i18n="priv_li5">사이트 운영 및 서비스 품질 개선</li>
-          <li data-i18n="priv_li6">익명 통계 분석</li>
-          <li data-i18n="priv_li7">보안 (비정상 접근 차단)</li>
-          <li data-i18n="priv_li8">광고 노출 빈도 최적화</li>
+          <li>사이트 운영 및 서비스 품질 개선</li>
+          <li>익명화된 트래픽 통계 분석</li>
+          <li>보안 — 비정상 접근·악성 봇 차단</li>
+          <li>광고 노출 빈도 최적화</li>
+          <li>Q&amp;A 게시판 작성·수정·삭제 시 본인 확인(비밀번호 해시 대조)</li>
         </ul>
 
-        <h2 data-i18n="priv_h3">3. 보관 기간</h2>
-        <p data-i18n="priv_p2">접속 로그는 <strong>30일</strong>간 보관 후 자동 삭제됩니다.</p>
+        <h2>3. 보관 및 파기</h2>
+        <p>접속 로그는 <strong>최대 30일</strong>간 보관 후 자동 삭제됩니다. Q&amp;A 게시물은 작성자 또는 관리자가 삭제할 때까지 보관되며, 비밀번호는 평문이 아닌 <strong>SHA-256 해시 형태</strong>로만 저장되어 원본 비밀번호 복원이 불가능합니다.</p>
 
-        <h2 data-i18n="priv_h4">4. 제3자 제공</h2>
-        <p data-i18n="priv_p3">본 사이트는 수집한 정보를 제3자에게 제공하지 않습니다. 다만 다음 서비스가 자체 수집할 수 있습니다.</p>
+        <h2>4. 제3자 제공 및 처리 위탁</h2>
+        <p>본 사이트는 이용자의 동의 없이 개인정보를 제3자에게 제공하지 않습니다. 다만 서비스 제공을 위해 다음의 제3자 서비스를 이용하며, 해당 서비스는 자체적으로 정보를 수집·처리할 수 있습니다.</p>
         <ul>
-          <li data-i18n="priv_li9"><strong>Google AdSense</strong>: 광고 게재용 쿠키 및 식별자</li>
-          <li data-i18n="priv_li10"><strong>외부 API</strong>: 거래 내역 조회 시 api.mbc.wiki 호출</li>
+          <li><strong>Google AdSense</strong> — 광고 게재 및 노출 최적화를 위해 쿠키 및 광고 식별자를 사용합니다. 자세한 내용은 <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener">Google 광고 정책</a>을 참고하세요.</li>
+          <li><strong>Google Search Console / Analytics</strong>(사용 시) — 익명화된 트래픽 통계 수집.</li>
+          <li><strong>외부 블록체인 API</strong> — 거래 내역·토큰 정보 조회를 위해 <code>api.mbc.wiki</code>, <code>tokens.mbc.wiki</code>에 요청을 보냅니다. 이때 이용자의 IP가 해당 서버에 노출될 수 있습니다.</li>
+          <li><strong>호스팅 사업자</strong> — Oracle Cloud Infrastructure(서울 리전). 서버 로그·트래픽 통계가 자동 기록됩니다.</li>
         </ul>
 
-        <h2 data-i18n="priv_h5">5. 쿠키 사용</h2>
-        <p data-i18n="priv_p4">광고 노출과 사이트 환경설정 저장에 쿠키가 사용됩니다.</p>
+        <h2>5. 쿠키 사용</h2>
+        <p>본 사이트는 다음 목적의 쿠키 및 로컬 스토리지를 사용합니다.</p>
+        <ul>
+          <li><strong>환경설정 저장</strong> — 언어(KOR/ENG), 사이드바 접힘 상태</li>
+          <li><strong>토큰 잔액 캐시</strong>(localStorage) — 같은 지갑의 토큰 잔액을 1시간 동안 재요청하지 않아 외부 API 부하 감소</li>
+          <li><strong>Google AdSense 쿠키</strong> — 광고 맞춤 설정 및 노출 빈도 제어</li>
+        </ul>
+        <p>이용자는 브라우저 설정에서 쿠키 저장을 거부할 수 있습니다. 단, 일부 기능(언어 설정 유지·광고 빈도 제어)이 제한될 수 있습니다. Google 맞춤 광고는 <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener">광고 설정</a>에서 옵트아웃 가능합니다.</p>
 
-        <h2 data-i18n="priv_h6">6. 문의</h2>
-        <p data-i18n="priv_p5">개인정보 처리에 관한 문의는 <a onclick="navigate('contact'); return false;" style="cursor:pointer;">문의 페이지</a>를 이용해 주세요.</p>
+        <h2>6. 이용자의 권리</h2>
+        <p>이용자는 언제든지 본인이 작성한 Q&amp;A 게시물의 열람·정정·삭제를 요청할 수 있습니다. Q&amp;A는 작성 시 입력한 비밀번호로 본인이 직접 수정·삭제 가능하며, 비밀번호 분실 시 운영자에게 문의해 주세요.</p>
+
+        <h2>7. 개인정보 보호책임자 및 문의처</h2>
+        <ul>
+          <li><strong>책임자</strong>: 사이트 운영자(개인)</li>
+          <li><strong>이메일</strong>: westsideksh@gmail.com</li>
+          <li><strong>응답 시간</strong>: 영업일 기준 2~3일 이내</li>
+        </ul>
+
+        <h2>8. 정책의 변경</h2>
+        <p>본 방침이 변경되는 경우 본 페이지를 통해 사전 공지합니다. 중대한 변경은 시행 7일 전 안내하며, 이용자가 거부할 권리가 있습니다. 본 방침의 최종 수정일은 페이지 상단에 표기되어 있습니다.</p>
+
+        <h2>9. 면책 및 한계</h2>
+        <p>본 사이트가 표시하는 블록체인 데이터는 공개된 원장(Public Ledger) 정보로, 지갑 주소 자체는 개인정보가 아닙니다. 다만 외부에서 지갑 주소와 실명을 연결할 경우 개인 추적이 가능할 수 있다는 점을 이용자가 인지하시기 바랍니다.</p>
+
+        <h2>10. 문의</h2>
+        <p>개인정보 처리에 관한 문의는 <a onclick="navigate('contact'); return false;" style="cursor:pointer; color:var(--mbc-accent); font-weight:600;">문의 페이지</a> 또는 위 이메일로 연락 주세요.</p>
       </div>
     </section>
 
     <!-- ─────────────── 페이지 7: 문의 ─────────────── -->
     <section class="page-section" id="page-contact">
-      <div class="page-title">✉️ <span data-i18n="page_contact_title">문의</span></div>
-      <div class="page-subtitle" data-i18n="page_contact_sub">제안, 버그 신고, 협력 문의를 받습니다</div>
+      <div class="page-title">✉️ <span data-i18n="page_contact_title">문의 · 운영 정보</span></div>
+      <div class="page-subtitle" data-i18n="page_contact_sub">사이트 운영 정보, 데이터 출처, 연락 방법을 안내합니다</div>
 
       <div class="static-card">
-        <h2 data-i18n="contact_h1">연락 방법</h2>
+        <h2>1. 사이트 운영 정보</h2>
         <div class="info-row">
-          <div class="label" data-i18n="contact_email">이메일</div>
-          <div class="value">wsksh@naver.com</div>
+          <div class="label">사이트 명칭</div>
+          <div class="value">MBC Holder Explorer · microbitcoin.co.kr</div>
         </div>
         <div class="info-row">
-          <div class="label" data-i18n="contact_blog">블로그</div>
-          <div class="value"><a href="https://canary77.tistory.com" target="_blank">canary77.tistory.com</a></div>
+          <div class="label">운영자</div>
+          <div class="value">개인</div>
         </div>
         <div class="info-row">
-          <div class="label">GitHub</div>
-          <div class="value"><a href="https://github.com/MicroBitcoinOrg" target="_blank">github.com/MicroBitcoinOrg</a></div>
+          <div class="label">운영 형태</div>
+          <div class="value">비영리 커뮤니티 프로젝트(개인 운영, 광고 수익으로 서버비 충당)</div>
+        </div>
+        <div class="info-row">
+          <div class="label">서비스 시작</div>
+          <div class="value">2026년 5월</div>
+        </div>
+        <div class="info-row">
+          <div class="label">MicroBitcoin 공식 단체와의 관계</div>
+          <div class="value">무관 — 본 사이트는 커뮤니티 자율 운영이며, MicroBitcoin 재단·개발팀과 공식 제휴 관계가 없습니다.</div>
         </div>
 
-        <h3 data-i18n="contact_welcome">이런 문의를 환영합니다</h3>
+        <h2 style="margin-top:24px;">2. 데이터 출처</h2>
+        <p>본 사이트가 표시하는 모든 데이터의 출처는 다음과 같습니다.</p>
         <ul>
-          <li data-i18n="contact_w1">홀더 데이터 오류 신고</li>
-          <li data-i18n="contact_w2">새 기능 제안</li>
-          <li data-i18n="contact_w3">API 활용 관련</li>
-          <li data-i18n="contact_w4">광고/협력 제안</li>
-          <li data-i18n="contact_w5">MBC 관련 정보 공유</li>
+          <li><strong>블록·트랜잭션</strong> — 자체 운영 MicroBitcoin 풀노드(<code>microd</code>)에서 RPC로 직접 수집</li>
+          <li><strong>홀더 리스트(잔액·순위)</strong> — 풀노드 UTXO 인덱스를 30초 간격으로 폴링하여 자체 SQLite DB(<code>transfers.db</code>)에 누적</li>
+          <li><strong>레이어2 토큰 정보</strong> — <code>tokens.mbc.wiki</code> 외부 API 프록시(60분 캐시) + 자체 워커가 24시간 주기로 보강 수집</li>
+          <li><strong>시세 정보</strong> — CoinMarketCap 공개 API(5분 캐시), 환율은 open.er-api.com</li>
+          <li><strong>네트워크 통계</strong> — 풀노드 <code>getblockchaininfo</code>, <code>getmininginfo</code> RPC</li>
         </ul>
 
-        <h3 data-i18n="contact_reply">답변 안내</h3>
-        <p data-i18n="contact_reply_p">모든 문의는 영업일 기준 2~3일 이내 답변 드리도록 노력합니다.</p>
+        <h2 style="margin-top:24px;">3. 연락 방법</h2>
+        <div class="info-row">
+          <div class="label" data-i18n="contact_email">이메일</div>
+          <div class="value"><a href="mailto:westsideksh@gmail.com">westsideksh@gmail.com</a></div>
+        </div>
+        <div class="info-row">
+          <div class="label" data-i18n="contact_blog">운영자 블로그</div>
+          <div class="value"><a href="https://canary77.tistory.com" target="_blank" rel="noopener">canary77.tistory.com</a></div>
+        </div>
+        <div class="info-row">
+          <div class="label">사이트 내 Q&amp;A</div>
+          <div class="value"><a onclick="navigate('qna'); return false;" style="cursor:pointer; color:var(--mbc-accent); font-weight:600;">Q&amp;A 게시판 바로가기</a> — 익명 작성 가능</div>
+        </div>
+        <div class="info-row">
+          <div class="label">GitHub(MicroBitcoin 공식)</div>
+          <div class="value"><a href="https://github.com/MicroBitcoinOrg" target="_blank" rel="noopener">github.com/MicroBitcoinOrg</a></div>
+        </div>
+
+        <h2 style="margin-top:24px;">4. 환영하는 문의</h2>
+        <ul>
+          <li>홀더 데이터 오류 신고(누락·중복·잘못된 잔액)</li>
+          <li>새 기능 제안 — 추가하고 싶은 통계·필터·페이지</li>
+          <li>API 활용 관련(연구·교육 목적의 데이터 활용)</li>
+          <li>광고·협력·후원 제안</li>
+          <li>MBC 생태계 관련 정보 공유(거래소 상장·뉴스 등)</li>
+          <li>오탈자·번역 오류·접근성(스크린리더 등) 개선 제안</li>
+        </ul>
+
+        <h2 style="margin-top:24px;">5. 답변 안내</h2>
+        <p>모든 문의는 <strong>영업일 기준 2~3일</strong> 이내 답변 드리도록 노력합니다. 다만 운영자 1인이 자율적으로 관리하므로 일정에 따라 지연될 수 있습니다. 긴급 사안(보안 취약점·법적 요청)은 메일 제목에 “[긴급]”을 표기해 주세요.</p>
+
+        <h2 style="margin-top:24px;">6. 책임 한계 및 면책</h2>
+        <p>본 사이트가 제공하는 정보는 <strong>공개된 블록체인 원장 데이터의 가공·시각화</strong>이며, 다음 사항을 명확히 안내드립니다.</p>
+        <ul>
+          <li>모든 데이터는 “있는 그대로(AS-IS)” 제공되며 정확성·완전성·실시간성을 보장하지 않습니다.</li>
+          <li>본 사이트의 정보는 <strong>투자 권유나 금융 자문이 아닙니다</strong>. 암호화폐 투자는 원금 손실 위험이 있으며 모든 결정과 결과의 책임은 이용자 본인에게 있습니다.</li>
+          <li>외부 거래소·지갑·서비스 이용 시 발생하는 손실에 대해 본 사이트는 책임지지 않습니다.</li>
+          <li>본 사이트는 예고 없이 일부 또는 전체 서비스가 중단될 수 있습니다(서버 비용·정책 변화 등).</li>
+        </ul>
+
+        <h2 style="margin-top:24px;">7. 신고 및 분쟁</h2>
+        <p>저작권 침해·명예훼손·개인정보 노출 등 권리 침해를 발견하신 경우 위 이메일로 신고해 주시면 확인 후 영업일 기준 3일 이내 조치하겠습니다. 본 사이트 이용으로 발생한 분쟁은 대한민국 법률을 준수하며, 관할 법원은 운영자 주소지 관할 법원으로 합니다.</p>
       </div>
     </section>
 
@@ -1221,6 +1331,6 @@
 
 
 
-  <script src="/assets/app.js?v=6" defer></script>
+  <script src="/assets/app.js?v=7" defer></script>
 </body>
 </html>

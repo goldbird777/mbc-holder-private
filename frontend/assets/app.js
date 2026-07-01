@@ -113,7 +113,7 @@ const i18n = {
     exchanges_update_title: "정보 제보",
     exchanges_update_p: "잘못된 정보 또는 새로 상장된 거래소 정보가 있으면 <a onclick=\"navigate('contact'); return false;\" style=\"cursor:pointer;\">문의 페이지</a>로 알려주세요. 빠르게 업데이트하겠습니다.",
 
-    page_about_title: "사이트 소개", page_about_sub: "MBC 홀더 탐색기에 대하여",
+    page_about_title: "사이트 소개", page_about_sub: "MicroBitcoin(MBC) 프로젝트와 본 탐색기에 대하여",
     about_h1: "MicroBitcoin 홀더 탐색기란?",
     about_p1: "본 사이트는 <strong>마이크로비트코인(MBC) 네트워크의 전체 홀더 정보</strong>를 누구나 쉽게 조회할 수 있도록 만들어진 커뮤니티 운영 익스플로러입니다.",
     about_p2: "MBC 풀노드를 직접 운영하며, 블록체인 데이터를 실시간으로 스캔해 모든 활성 주소와 잔액, 토큰 보유 현황을 표시합니다.",
@@ -132,7 +132,7 @@ const i18n = {
     about_disc1: "본 사이트는 MicroBitcoin 공식 단체와 무관한 커뮤니티 운영 사이트입니다. 표시되는 정보는 정확성을 보장하지 않으며, 투자 권유 또는 금융 자문이 아닙니다.",
     about_disc2: "관련 공식 자료는 <a href=\"https://microbitcoin.org\" target=\"_blank\">microbitcoin.org</a> 및 <a href=\"https://github.com/MicroBitcoinOrg\" target=\"_blank\">GitHub MicroBitcoinOrg</a>를 참고하세요.",
 
-    page_privacy_title: "개인정보처리방침", page_privacy_sub: "최종 수정일: 2026년 6월",
+    page_privacy_title: "개인정보처리방침", page_privacy_sub: "최종 수정일: 2026년 6월 29일 · 시행일: 2026년 6월 29일",
     priv_h1: "1. 수집하는 정보", priv_p1: "본 사이트는 다음 정보를 자동으로 수집할 수 있습니다.",
     priv_li1: "접속 IP 주소 (방문자 통계 목적)",
     priv_li2: "브라우저 종류 및 운영체제 정보",
@@ -150,8 +150,8 @@ const i18n = {
     priv_h5: "5. 쿠키 사용", priv_p4: "광고 노출과 사이트 환경설정 저장에 쿠키가 사용됩니다.",
     priv_h6: "6. 문의", priv_p5: "개인정보 처리에 관한 문의는 <a onclick=\"navigate('contact'); return false;\" style=\"cursor:pointer;\">문의 페이지</a>를 이용해 주세요.",
 
-    page_contact_title: "문의", page_contact_sub: "제안, 버그 신고, 협력 문의를 받습니다",
-    contact_h1: "연락 방법", contact_email: "이메일", contact_blog: "블로그",
+    page_contact_title: "문의 · 운영 정보", page_contact_sub: "사이트 운영 정보, 데이터 출처, 연락 방법을 안내합니다",
+    contact_h1: "연락 방법", contact_email: "이메일", contact_blog: "운영자 블로그",
     contact_welcome: "이런 문의를 환영합니다",
     contact_w1: "홀더 데이터 오류 신고", contact_w2: "새 기능 제안", contact_w3: "API 활용 관련",
     contact_w4: "광고/협력 제안", contact_w5: "MBC 관련 정보 공유",
@@ -273,7 +273,7 @@ const i18n = {
     exchanges_update_title: "Report Information",
     exchanges_update_p: "If you spot inaccurate info or a newly listed exchange, please let us know via the <a onclick=\"navigate('contact'); return false;\" style=\"cursor:pointer;\">contact page</a>. We'll update it promptly.",
 
-    page_about_title: "About", page_about_sub: "About MBC Holder Explorer",
+    page_about_title: "About", page_about_sub: "About the MicroBitcoin (MBC) project and this explorer",
     about_h1: "What is MicroBitcoin Holder Explorer?",
     about_p1: "This site is a community-run explorer that lets anyone view <strong>all holder information on the MicroBitcoin (MBC) network</strong>.",
     about_p2: "We run an MBC full node directly, scanning blockchain data in real time to display all active addresses, balances, and token holdings.",
@@ -292,7 +292,7 @@ const i18n = {
     about_disc1: "This is a community-run site, not affiliated with the official MicroBitcoin organization. Information is provided without warranty and is not investment advice.",
     about_disc2: "For official resources, see <a href=\"https://microbitcoin.org\" target=\"_blank\">microbitcoin.org</a> and <a href=\"https://github.com/MicroBitcoinOrg\" target=\"_blank\">GitHub MicroBitcoinOrg</a>.",
 
-    page_privacy_title: "Privacy Policy", page_privacy_sub: "Last updated: June 2026",
+    page_privacy_title: "Privacy Policy", page_privacy_sub: "Last updated: June 29, 2026 · Effective: June 29, 2026",
     priv_h1: "1. Information Collected", priv_p1: "This site may automatically collect the following:",
     priv_li1: "Visitor IP address (for stats)",
     priv_li2: "Browser type and OS information",
@@ -310,8 +310,8 @@ const i18n = {
     priv_h5: "5. Cookies", priv_p4: "Cookies are used for ad serving and preference storage.",
     priv_h6: "6. Inquiries", priv_p5: "For privacy-related questions, use the <a onclick=\"navigate('contact'); return false;\" style=\"cursor:pointer;\">contact page</a>.",
 
-    page_contact_title: "Contact", page_contact_sub: "Suggestions, bug reports, and partnership inquiries welcome",
-    contact_h1: "How to Reach Us", contact_email: "Email", contact_blog: "Blog",
+    page_contact_title: "Contact · Operations", page_contact_sub: "Site operations, data sources, and contact information",
+    contact_h1: "How to Reach Us", contact_email: "Email", contact_blog: "Operator Blog",
     contact_welcome: "What we welcome",
     contact_w1: "Report holder data errors", contact_w2: "Feature suggestions", contact_w3: "API usage questions",
     contact_w4: "Advertising / partnership proposals", contact_w5: "Sharing MBC-related information",
