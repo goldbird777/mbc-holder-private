@@ -378,21 +378,21 @@
     z-index: 99;
   }
 
-  /* ── 4. Layout: 블록 흐름, 헤더+광고+후원바 높이만큼 위 여백 확보 ── */
+  /* ── 4. Layout: 블록 흐름, 헤더+광고 높이만큼 위 여백 확보 ── */
   .layout {
     display: block !important;
     min-height: auto;
-    padding-top: 222px;       /* 68(header) + 110(ad bar) + 44(donate bar) */
+    padding-top: 178px;       /* 68(header) + 110(ad bar) */
     position: relative;
   }
 
   /* ── 5. Sidebar: 데스크톱 항상 좌측 고정, 내부만 스크롤 ── */
   .sidebar {
     position: fixed !important;
-    top: 222px;
+    top: 178px;
     left: 0;
     width: 235px;
-    height: calc(100vh - 222px);
+    height: calc(100vh - 178px);
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
@@ -408,7 +408,7 @@
     margin-left: 235px;
     width: calc(100% - 235px);
     max-width: calc(100vw - 235px);
-    min-height: calc(100vh - 222px);
+    min-height: calc(100vh - 178px);
     transition: margin-left .25s, width .25s;
   }
   .sidebar.collapsed ~ .main-wrap,
@@ -468,8 +468,8 @@
   @media (max-width: 768px) {
     header { height: 60px !important; padding: 0 12px; }
     .top-ad-bar { top: 60px !important; }
-    #donateBar { top: 140px !important; padding: 6px 10px !important; }
-    .layout { padding-top: 196px !important; }  /* 60 + 80 + 56(donate, 2줄) */
+    #donateBar { padding: 8px 10px !important; }
+    .layout { padding-top: 140px !important; }  /* 60 + 80(ad bar) */
 
     .sidebar {
       top: 0 !important;
@@ -487,15 +487,14 @@
       margin-left: 0 !important;
       width: 100% !important;
       max-width: 100vw !important;
-      min-height: calc(100vh - 196px);
+      min-height: calc(100vh - 140px);
     }
     .container { padding: 14px 10px; }
 
     /* 모바일 안전 영역 (iPhone X+ 노치) */
     header { padding-top: env(safe-area-inset-top); height: calc(60px + env(safe-area-inset-top)); }
     .top-ad-bar { top: calc(60px + env(safe-area-inset-top)) !important; }
-    #donateBar { top: calc(140px + env(safe-area-inset-top)) !important; }
-    .layout { padding-top: calc(196px + env(safe-area-inset-top)) !important; }
+    .layout { padding-top: calc(140px + env(safe-area-inset-top)) !important; }
   }
 
   /* ────────────────────────────────────────────────
