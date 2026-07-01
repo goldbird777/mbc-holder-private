@@ -722,65 +722,13 @@ function pickAddr(spk) {
 }
 
 async function buildRecentTransfers() {
-    var tipHeight = await rpc('getblockcount');
-    var transfers = [];
-
-    for (var h = tipHeight; h > tipHeight - RECENT_SCAN_BLOCKS && h > 0; h--) {
-        var blockHash = await rpc('getblockhash', [h]);
-        var block = await rpc('getblock', [blockHash, 2]);
-
-        for (var ti = 0; ti < block.tx.length; ti++) {
-            var tx = block.tx[ti];
-            // coinbase 제외
-            if (tx.vin && tx.vin[0] && tx.vin[0].coinbase) continue;
-
-            // From: 첫 vin의 이전 tx 주소
-            var fromAddr = null;
-            for (var vi = 0; vi < (tx.vin || []).length && !fromAddr; vi++) {
-                var vin = tx.vin[vi];
-                if (vin.coinbase) continue;
-                try {
-                    var prevTx = await rpc('getrawtransaction', [vin.txid, true]);
-                    var prevOut = prevTx.vout[vin.vout];
-                    fromAddr = pickAddr(prevOut.scriptPubKey);
-                } catch (e) {}
-            }
-
-            // To: 자기 자신(거스름돈) 제외 후 가장 큰 vout
-            var toAddr = null;
-            var amount = 0;
-            for (var oi = 0; oi < (tx.vout || []).length; oi++) {
-                var vout = tx.vout[oi];
-                var a = pickAddr(vout.scriptPubKey);
-                var v = Math.round((vout.value || 0) * 10000);
-                if (a && a !== fromAddr && v > amount) { toAddr = a; amount = v; }
-            }
-            // 전부 자기 자신이면 가장 큰 vout
-            if (!toAddr) {
-                for (var oj = 0; oj < (tx.vout || []).length; oj++) {
-                    var v2 = Math.round((tx.vout[oj].value || 0) * 10000);
-                    if (v2 > amount) { toAddr = pickAddr(tx.vout[oj].scriptPubKey); amount = v2; }
-                }
-            }
-
-            transfers.push({
-                txid: tx.txid,
-                from: fromAddr || '알수없음',
-                to: toAddr || '알수없음',
-                amount: amount,
-                block: h,
-                time: block.time || 0
-            });
-
-            if (transfers.length >= RECENT_MAX) break;
-        }
-        if (transfers.length >= RECENT_MAX) break;
-    }
-
+    var result = transfersDb.listTransfers({ page: 1, perPage: RECENT_MAX });
+    var stats = transfersDb.stats();
     return {
-        transfers: transfers.slice(0, RECENT_MAX),
-        blockHeight: tipHeight,
-        scanBlocks: RECENT_SCAN_BLOCKS,
+        transfers: result.items || [],
+        blockHeight: stats.latestBlock || 0,
+        scanBlocks: 0,
+        source: 'transfers_db',
         updatedAt: new Date().toISOString()
     };
 }
