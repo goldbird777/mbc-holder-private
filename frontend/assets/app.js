@@ -500,7 +500,7 @@ function navigate(page, fromPopstate) {
   if (page === 'mining' && typeof fetchCalcData === 'function') fetchCalcData();
 
   // 게시판 페이지 진입 시 데이터 로드
-  if (page === 'news' && typeof loadBoard === 'function') loadBoard('news');
+  if (page === 'news' && typeof loadNewsList === 'function') loadNewsList(1);
   if (page === 'qna' && typeof loadQnaList === 'function') loadQnaList(1);
   if (page === 'lab' && typeof loadBoard === 'function') loadBoard('lab');
   if (page === 'links' && typeof loadBoard === 'function') loadBoard('links');
@@ -509,11 +509,106 @@ function navigate(page, fromPopstate) {
 
 // ── Q&A 게시판 (익명 + 비밀번호) ────────────────────────
 let qnaCurrentPage = 1;
+let newsCurrentPage = 1;
 
 async function fetchPublicBoard(type) {
   const res = await fetch('/data/board/' + encodeURIComponent(type) + '.json?v=' + Date.now());
   if (!res.ok) throw new Error('static board not found');
   return res.json();
+}
+
+async function fetchBoardItems(type) {
+  try {
+    return await fetchPublicBoard(type);
+  } catch (staticErr) {
+    const res = await fetch('/api/board/' + type);
+    return await res.json();
+  }
+}
+
+async function loadNewsList(page) {
+  page = page || newsCurrentPage;
+  newsCurrentPage = page;
+  const el = document.getElementById('newsList');
+  const pager = document.getElementById('newsPagination');
+  if (!el) return;
+  el.innerHTML = '<div style="text-align:center; padding:30px; color:#999;">불러오는 중…</div>';
+  if (pager) pager.innerHTML = '';
+  try {
+    const data = await fetchBoardItems('news');
+    const items = data.items || [];
+    if (items.length === 0) {
+      el.innerHTML = '<div style="text-align:center; padding:40px 20px; color:#999;">아직 등록된 항목이 없습니다.</div>';
+      return;
+    }
+    const perPage = 3;
+    const totalPages = Math.max(1, Math.ceil(items.length / perPage));
+    const safePage = Math.min(Math.max(1, page), totalPages);
+    const pageItems = items.slice((safePage - 1) * perPage, safePage * perPage);
+    el.innerHTML = pageItems.map(it => {
+      return `
+        <div class="static-card" onclick="showNewsDetail('${escHtml(it.id)}')" style="padding:18px 22px; cursor:pointer;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
+            <h2 style="margin:0; font-size:16px; color:var(--mbc-navy);">${escHtml(it.title)}</h2>
+            <div style="font-size:11px; color:var(--text-sub); font-weight:600;">${fmtDate(it.createdAt)}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    renderNewsPagination(totalPages, safePage);
+  } catch (e) {
+    el.innerHTML = '<div style="text-align:center; padding:30px; color:#C62828;">로드 실패: ' + escHtml(e.message) + '</div>';
+  }
+}
+
+function renderNewsPagination(totalPages, currentPage) {
+  const el = document.getElementById('newsPagination');
+  if (!el) return;
+  if (totalPages <= 1) { el.innerHTML = ''; return; }
+  let html = '';
+  html += `<button onclick="loadNewsList(1)" ${currentPage===1?'disabled':''}>«</button>`;
+  html += `<button onclick="loadNewsList(${Math.max(1, currentPage-1)})" ${currentPage===1?'disabled':''}>‹</button>`;
+  for (let i = 1; i <= totalPages; i++) {
+    html += `<button class="${i===currentPage?'active':''}" onclick="loadNewsList(${i})">${i}</button>`;
+  }
+  html += `<button onclick="loadNewsList(${Math.min(totalPages, currentPage+1)})" ${currentPage===totalPages?'disabled':''}>›</button>`;
+  html += `<button onclick="loadNewsList(${totalPages})" ${currentPage===totalPages?'disabled':''}>»</button>`;
+  el.innerHTML = html;
+}
+
+async function showNewsDetail(id, fromPopstate) {
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('page-news-detail').classList.add('active');
+  document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+  const newsMenu = document.querySelector('.menu-item[data-page="news"]');
+  if (newsMenu) newsMenu.classList.add('active');
+  if (!fromPopstate) {
+    const newPath = '/news/' + encodeURIComponent(id);
+    if (location.pathname !== newPath) history.pushState({news: id}, '', newPath);
+  }
+  document.querySelector('.main-content').scrollTop = 0;
+  window.scrollTo(0, 0);
+
+  const card = document.getElementById('newsDetailCard');
+  card.innerHTML = '<div style="text-align:center; padding:30px; color:#999;">불러오는 중…</div>';
+  try {
+    const data = await fetchBoardItems('news');
+    const it = (data.items || []).find(x => String(x.id) === String(id));
+    if (!it) {
+      card.innerHTML = '<div style="text-align:center; padding:30px; color:var(--red);">글을 찾을 수 없습니다</div>';
+      return;
+    }
+    document.title = (it.title || '최근 소식') + ' - 최근 소식 | MicroBitcoin 탐색기';
+    card.innerHTML = `
+      <div style="border-bottom:1px solid var(--border); padding-bottom:14px; margin-bottom:18px;">
+        <h2 style="font-size:20px; color:var(--mbc-navy); margin-bottom:8px;">${escHtml(it.title)}</h2>
+        <div style="font-size:12px; color:var(--text-sub);">${fmtDate(it.createdAt)}</div>
+      </div>
+      <div style="font-size:14px; color:var(--text); line-height:1.8; white-space:pre-wrap; word-break:break-word;">${escHtml(it.content)}</div>
+    `;
+  } catch (e) {
+    card.innerHTML = '<div style="text-align:center; padding:30px; color:var(--red);">로드 실패: ' + escHtml(e.message) + '</div>';
+  }
 }
 
 async function loadQnaList(page) {
@@ -1018,13 +1113,7 @@ async function loadBoard(type) {
   const el = document.getElementById(containerId);
   if (!el) return;
   try {
-    let data;
-    try {
-      data = await fetchPublicBoard(type);
-    } catch (staticErr) {
-      const res = await fetch('/api/board/' + type);
-      data = await res.json();
-    }
+    let data = await fetchBoardItems(type);
     const items = data.items || [];
 
     if (items.length === 0) {
@@ -1033,7 +1122,7 @@ async function loadBoard(type) {
       return;
     }
 
-    if (type === 'news' || type === 'lab') {
+    if (type === 'lab') {
       el.innerHTML = items.map(it => `
         <div class="static-card" style="padding:20px 24px;">
           <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:10px;">
@@ -1477,7 +1566,7 @@ async function loadTransactions() {
 }
 
 // ── 라우트 파싱 ─────────────────────────
-const VALID_PAGES = ['holders','transfers','whales','search','stats','mining','exchanges','wonpay','tokens','news','qna','qna-detail','lab','links','about','privacy','contact'];
+const VALID_PAGES = ['holders','transfers','whales','search','stats','mining','exchanges','wonpay','tokens','news','news-detail','qna','qna-detail','lab','links','about','privacy','contact'];
 
 function parseRoute() {
   // 우선순위: pathname → hash (legacy #holders 등 구글 인덱스 호환)
@@ -1490,6 +1579,9 @@ function parseRoute() {
   }
   if (p.startsWith('tokens/')) {
     return { type: 'token', ticker: decodeURIComponent(p.substring(7)) };
+  }
+  if (p.startsWith('news/')) {
+    return { type: 'news-detail', id: decodeURIComponent(p.substring(5)) };
   }
   if (p.startsWith('qna/')) {
     return { type: 'qna-detail', id: decodeURIComponent(p.substring(4)) };
@@ -1507,6 +1599,7 @@ window.addEventListener('popstate', (e) => {
   const r = parseRoute();
   if (r.type === 'detail') showDetail(r.address, undefined, true);
   else if (r.type === 'token') showTokenDetail(r.ticker, true);
+  else if (r.type === 'news-detail') showNewsDetail(r.id, true);
   else if (r.type === 'qna-detail') showQnaDetail(r.id, true);
   else navigate(r.page, true);
 });
@@ -2077,6 +2170,8 @@ window.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => showDetail(r.address), 500);
   } else if (r.type === 'token') {
     setTimeout(() => showTokenDetail(r.ticker), 100);
+  } else if (r.type === 'news-detail') {
+    setTimeout(() => showNewsDetail(r.id), 100);
   } else if (r.type === 'qna-detail') {
     setTimeout(() => showQnaDetail(r.id), 100);
   } else {

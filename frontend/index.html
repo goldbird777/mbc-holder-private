@@ -784,6 +784,15 @@
       <div id="newsList" style="display:flex; flex-direction:column; gap:14px;">
         <div style="text-align:center; padding:30px; color:#999;">불러오는 중…</div>
       </div>
+      <div id="newsPagination" class="pagination" style="margin-top:18px;"></div>
+    </section>
+
+    <!-- ─────────────── 페이지: 최근 소식 상세 ─────────────── -->
+    <section class="page-section" id="page-news-detail">
+      <a onclick="navigate('news'); return false;" style="display:inline-flex; align-items:center; gap:6px; color:var(--mbc-navy); cursor:pointer; font-size:13px; font-weight:600; margin-bottom:14px; text-decoration:none;">← 목록으로</a>
+      <div id="newsDetailCard" class="static-card">
+        <div style="text-align:center; padding:30px; color:#999;">불러오는 중…</div>
+      </div>
     </section>
 
     <!-- ─────────────── 페이지: Q&A ─────────────── -->
@@ -1352,6 +1361,6 @@
 
 
 
-  <script src="/assets/app.js?v=13" defer></script>
+  <script src="/assets/app.js?v=14" defer></script>
 </body>
 </html>
